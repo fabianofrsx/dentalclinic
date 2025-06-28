@@ -1,0 +1,14 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Receber Parcela {{ parcela.numero }} do contrato {{ parcela.contrato.numero_contrato }}</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Confirmar Recebimento</button>
+        <a href="{% url 'paciente:editar_paciente' paciente_id=parcela.contrato.paciente.id %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}
+

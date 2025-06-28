@@ -1,0 +1,162 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <div class="card shadow">
+    <div class="card-header bg-primary text-white">
+      <div class="d-flex justify-content-between align-items-center">
+        <h2 class="h4 mb-0">
+          <i class="fas fa-file-invoice-dollar me-2"></i>Relatório do contas a receber
+        </h2>
+        <a href="?status={{ status }}&paciente={{ paciente_selecionado }}&data_inicio={{ data_inicio }}&data_fim={{ data_fim }}&exportar=1" 
+           class="btn btn-light btn-sm">
+          <i class="fas fa-file-pdf me-1"></i>Exportar PDF
+        </a>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <form method="get" class="mb-4">
+        <div class="row g-3">
+          <div class="col-md-3">
+            <label class="form-label fw-bold">Status</label>
+            <select name="status" class="form-select" onchange="this.form.submit()">
+              <option value="">Todos</option>
+              <option value="pagas" {% if status == 'pagas' %}selected{% endif %}>Pagas</option>
+              <option value="atrasadas" {% if status == 'atrasadas' %}selected{% endif %}>Atrasadas</option>
+              <option value="a_receber" {% if status == 'a_receber' %}selected{% endif %}>A Receber</option>
+            </select>
+          </div>
+
+          <div class="col-md-4">
+             <label class="form-label fw-bold">Paciente</label>
+             <select name="paciente" class="form-select" onchange="this.form.submit()">
+                 <option value="">Todos</option>
+                     {% for paciente in pacientes %}
+                     <option value="{{ paciente.id }}" {% if paciente.id|stringformat:"s" == paciente_selecionado %}selected{% endif %}>
+                     {{ paciente.nome }}
+                    </option>
+                  {% endfor %}
+                </select>
+            </div>
+
+          <div class="col-md-2">
+            <label class="form-label fw-bold">Data Início</label>
+            <input type="date" name="data_inicio" class="form-control" value="{{ data_inicio }}" onchange="this.form.submit()">
+          </div>
+
+          <div class="col-md-2">
+            <label class="form-label fw-bold">Data Fim</label>
+            <input type="date" name="data_fim" class="form-control" value="{{ data_fim }}" onchange="this.form.submit()">
+          </div>
+
+          <div class="col-md-1 d-flex align-items-end">
+            <button type="button" onclick="this.form.submit()" class="btn btn-primary w-100">
+              <i class="fas fa-filter"></i>
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>Contrato</th>
+              <th>Paciente</th>
+              <th>Parcela</th>
+              <th>Valor</th>
+              <th>Vencimento</th>
+              <th>Status</th>
+              <th>Forma Pagamento</th>
+              <th class="text-end">Dias Atraso</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p, atraso in parcelas_list %}
+            <tr>
+              <td class="fw-semibold">{{ p.contrato.numero_contrato }}</td>
+              <td>{{ p.contrato.paciente.nome }}</td>
+              <td>{{ p.numero }}</td>
+              <td class="fw-semibold">R$ {{ p.valor|floatformat:2 }}</td>
+              <td class="{% if p.data_vencimento < today and p.status != 'pago' %}text-danger{% endif %}">
+                {{ p.data_vencimento|date:"d/m/Y" }}
+              </td>
+              <td>
+                {% if p.status == 'pago' %}
+                  <span class="badge bg-success rounded-pill">
+                    <i class="fas fa-check-circle me-1"></i> Pago
+                  </span>
+                {% elif p.data_vencimento < today %}
+                  <span class="badge bg-danger rounded-pill">
+                    <i class="fas fa-exclamation-circle me-1"></i> Atrasado
+                  </span>
+                {% else %}
+                  <span class="badge bg-warning text-dark rounded-pill">
+                    <i class="fas fa-clock me-1"></i> Aberto
+                  </span>
+                {% endif %}
+              </td>
+              <td>{{ p.get_forma_pagamento_display|default:"-" }}</td>
+              <td class="text-end {% if atraso > 0 %}fw-bold text-danger{% endif %}">
+                {% if atraso > 0 %}{{ atraso }}{% else %}-{% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="8" class="text-center py-4 text-muted">
+                <i class="fas fa-search me-2"></i>Nenhuma parcela encontrada com os filtros selecionados
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card-footer bg-light">
+      <div class="d-flex justify-content-between align-items-center">
+        <small class="text-muted">Total de parcelas: {{ parcelas_list|length }}</small>
+        <small class="text-muted">Atualizado em {% now "d/m/Y H:i" %}</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .table th {
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .table-hover tbody tr:hover {
+    background-color: rgba(13, 110, 253, 0.05);
+  }
+  .card-header {
+    border-bottom: none;
+  }
+</style>
+
+<!-- Adicione os scripts se ainda não tiver -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
+
+<script>
+$(function() {
+    $("#busca").autocomplete({
+        source: "{% url 'financeiro:autocomplete_paciente' %}",
+        minLength: 2,
+        select: function(event, ui) {
+            $("#busca").val(ui.item.label);
+            $("#paciente_id").val(ui.item.id);
+            return false; // evita que o valor padrão seja sobrescrito
+        },
+        focus: function(event, ui) {
+            $("#busca").val(ui.item.label);
+            return false;
+        }
+    });
+});
+</script>
+{% endblock %}

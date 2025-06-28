@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Carnê de Pagamentos - {{ contrato.numero_contrato }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 0.5cm;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10px;
+        }
+        .pagina {
+            width: 100%;
+            page-break-after: always;
+        }
+        .parcela {
+            width: 100%;
+            border: 1px solid #000;
+            margin-bottom: 10px;
+            page-break-inside: avoid;
+        }
+        .cabecalho {
+            background-color: #f0f0f0;
+            padding: 5px;
+            border-bottom: 1px solid #000;
+        }
+        .corpo {
+            padding: 5px;
+            display: flex;
+        }
+        .detalhes {
+            flex: 70%;
+        }
+        .canhoto {
+            flex: 30%;
+            border-left: 1px dashed #000;
+            padding-left: 5px;
+            text-align: center;
+        }
+        .linha {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 3px;
+        }
+        .assinatura {
+            height: 30px;
+            border-top: 1px dashed #000;
+            margin-top: 15px;
+            padding-top: 3px;
+        }
+        .logo {
+            max-width: 100px;
+            max-height: 50px;
+        }
+        .texto-pequeno {
+            font-size: 8px;
+        }
+    </style>
+</head>
+<body>
+    {% for grupo in parcelas_grupos %}
+    <div class="pagina">
+        {% for parcela in grupo %}
+        <div class="parcela">
+            <div class="cabecalho">
+                <div class="linha">
+                    <div>
+                        <strong>Cliente:</strong> {{ contrato.paciente.nome }}
+                    </div>
+                    <div>
+                        <strong>Contrato:</strong> {{ contrato.numero_contrato }}
+                    </div>
+                </div>
+                <div class="linha">
+                    <div>
+                        <strong>Parcela:</strong> {{ parcela.numero }}/{{ contrato.parcelas.count }}
+                    </div>
+                    <div>
+                        <strong>Vencimento:</strong> {{ parcela.data_vencimento|date:"d/m/Y" }}
+                    </div>
+                </div>
+            </div>
+            <div class="corpo">
+                <div class="detalhes">
+                    <div class="linha">
+                        <div><strong>Valor:</strong> R$ {{ parcela.valor|floatformat:2 }}</div>
+                        <div><strong>Status:</strong> {{ parcela.get_status_display }}</div>
+                    </div>
+                    <div class="linha">
+                        <div><strong>Endereço:</strong> {{ contrato.paciente.endereco }}</div>
+                    </div>
+                    <div class="linha">
+                        <div><strong>Telefone:</strong> {{ contrato.paciente.telefone }}</div>
+                    </div>
+                    <div class="assinatura">
+                        Assinatura do Recebedor
+                    </div>
+                </div>
+                <div class="canhoto">
+                    
+                    <div style="margin-top: 10px;">
+                        <strong>Recibo de Pagamento</strong>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <div>Cliente: {{ contrato.paciente.nome }}</div>
+                        <div>Parcela: {{ parcela.numero }}/{{ contrato.parcelas.count }}</div>
+                        <div>Valor: R$ {{ parcela.valor|floatformat:2 }}</div>
+                        <div>Vencimento: {{ parcela.data_vencimento|date:"d/m/Y" }}</div>
+                    </div>
+                    <div class="assinatura texto-pequeno">
+                        Assinatura do Cliente
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endfor %}
+</body>
+</html>
+
+
+
+def gerar_carne_pdf(request, contrato_id):
+    contrato = Contrato.objects.get(id=contrato_id)
+    parcelas = contrato.parcelas.all().order_by('numero')
+    
+    # Dividir parcelas em grupos de 4
+    parcelas_grupos = [parcelas[i:i + 4] for i in range(0, len(parcelas), 4)]
+    
+    context = {
+        'contrato': contrato,
+        'parcelas_grupos': parcelas_grupos,
+        'logo_url': 'static/logo/logo.png'  # Adicione o caminho do seu logo
+    }
+    
+    template = get_template('financeiro/parcela/carne_pdf.html')
+    html = template.render(context)
+    
+    result = BytesIO()
+    pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), result)
+    
+    if not pdf.err:
+        response = HttpResponse(result.getvalue(), content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="carne_contrato_{contrato.numero_contrato}.pdf"'
+        return response
+    
+    return HttpResponse('Erro ao gerar PDF', status=400)

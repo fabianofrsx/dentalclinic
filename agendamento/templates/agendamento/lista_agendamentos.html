@@ -1,0 +1,203 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="container mt-4">
+
+    <div class="card shadow mb-4">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">Filtrar Agendamentos</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" id="filter-form">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label for="{{ filter.form.data_inicio.id_for_label }}" class="form-label">Data Início:</label>
+                        {{ filter.form.data_inicio }}
+                    </div>
+                    <div class="col-md-3">
+                        <label for="{{ filter.form.data_fim.id_for_label }}" class="form-label">Data Fim:</label>
+                        {{ filter.form.data_fim }}
+                    </div>
+                    <div class="col-md-3">
+                        <label for="busca">Buscar por Nome ou CPF:</label>
+                        <input type="text" id="busca" name="busca" class="form-control" placeholder="Digite nome ou CPF" value="{{ request.GET.busca }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="{{ filter.form.dentista.id_for_label }}" class="form-label">Dentista:</label>
+                        {{ filter.form.dentista }}
+                    </div>
+                    <div class="col-md-3">
+                        <label for="{{ filter.form.status.id_for_label }}" class="form-label">Status:</label>
+                        {{ filter.form.status }}
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end mt-4">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="fas fa-search me-1"></i> Pesquisar
+                    </button>
+                    <a href="{% url 'agendamento:lista_agendamentos' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-eraser me-1"></i> Limpar Filtros
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Resumo dos Totais -->
+<div class="card shadow mb-4">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0">Resumo dos Resultados</h5>
+    </div>
+    <div class="card-body">
+        <div class="row text-center">
+            <div class="col-md-3">
+                <h6>Total de Agendamentos</h6>
+                <span class="badge bg-dark fs-5">{{ total }}</span>
+            </div>
+            <div class="col-md-2">
+                <h6>Agendado</h6>
+                <span class="badge bg-primary fs-5">{{ total_agendado }}</span>
+            </div>
+            <div class="col-md-2">
+                <h6>Atendido</h6>
+                <span class="badge bg-success fs-5">{{ total_atendido }}</span>
+            </div>
+            <div class="col-md-2">
+                <h6>Cancelado</h6>
+                <span class="badge bg-danger fs-5">{{ total_cancelado }}</span>
+            </div>
+            <div class="col-md-3">
+                <h6>Não Atendido</h6>
+                <span class="badge bg-warning text-dark fs-5">{{ total_nao_atendido }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-end mb-3">
+    <a href="{% url 'agendamento:agendamentos_pdf' %}?{{ request.GET.urlencode }}" class="btn btn-danger">
+        <i class="fas fa-file-pdf"></i> Gerar PDF
+    </a>
+</div>
+
+<div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Todos os Agendamentos</h4>
+        </div>
+        <div class="card-body p-0">
+            {% if agendamentos %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-agendamentos mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Data</th>
+                                <th>Hora</th>
+                                <th>Paciente</th>
+                                <th>Dentista</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for agendamento in agendamentos %}
+                            <tr> 
+                                <td>{{ agendamento.data|date:"d/m/Y" }}</td>
+                                <td>{{ agendamento.hora|time:"H:i" }}</td>
+                                <td>{{ agendamento.paciente.nome }}</td>
+                                <td>{{ agendamento.dentista.nome }}</td>
+                                <td>
+                                    {% if agendamento.status == 'agendado' %}
+                                    <span class="badge bg-primary">Agendado</span>
+                                    {% elif agendamento.status == 'cancelado' %}
+                                    <span class="badge bg-danger">Cancelado</span>
+                                    {% elif agendamento.status == 'atendido' %}
+                                    <span class="badge bg-success">Atendido</span>
+                                    {% elif agendamento.status == 'nao_atendido' %}
+                                    <span class="badge bg-warning text-dark">Não Atendido</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">{{ agendamento.status|capfirst }}</span>
+                                    {% endif %}
+                                    <td class="text-center">
+                                      <div class="btn-group btn-group-sm" role="group">
+                                         <a href="{% url 'agendamento:editar_agenda' agendamento.id %}" class="btn btn-outline-primary" title="Abrir">
+                                         <i class="fas fa-edit"></i>
+                                         </a>
+                                         <a href="{% url 'agendamento:excluir_agenda' agendamento.id %}" class="btn btn-outline-danger" title="Excluir">
+                                         <i class="fas fa-trash-alt"></i>
+                                         </a>
+                                        </div>
+                                    </td>
+
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+           <!-- Adicione esta parte para a paginação -->
+                <div class="p-3">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            {% if agendamentos.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1{% if request.GET.data_inicio %}&data_inicio={{ request.GET.data_inicio }}{% endif %}{% if request.GET.data_fim %}&data_fim={{ request.GET.data_fim }}{% endif %}{% if request.GET.paciente %}&paciente={{ request.GET.paciente }}{% endif %}{% if request.GET.dentista %}&dentista={{ request.GET.dentista }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" aria-label="First">
+                                        <span aria-hidden="true">&laquo;&laquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ agendamentos.previous_page_number }}{% if request.GET.data_inicio %}&data_inicio={{ request.GET.data_inicio }}{% endif %}{% if request.GET.data_fim %}&data_fim={{ request.GET.data_fim }}{% endif %}{% if request.GET.paciente %}&paciente={{ request.GET.paciente }}{% endif %}{% if request.GET.dentista %}&dentista={{ request.GET.dentista }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                            
+                            {% for num in agendamentos.paginator.page_range %}
+                                {% if agendamentos.number == num %}
+                                    <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                                {% elif num > agendamentos.number|add:'-3' and num < agendamentos.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}{% if request.GET.data_inicio %}&data_inicio={{ request.GET.data_inicio }}{% endif %}{% if request.GET.data_fim %}&data_fim={{ request.GET.data_fim }}{% endif %}{% if request.GET.paciente %}&paciente={{ request.GET.paciente }}{% endif %}{% if request.GET.dentista %}&dentista={{ request.GET.dentista }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if agendamentos.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ agendamentos.next_page_number }}{% if request.GET.data_inicio %}&data_inicio={{ request.GET.data_inicio }}{% endif %}{% if request.GET.data_fim %}&data_fim={{ request.GET.data_fim }}{% endif %}{% if request.GET.paciente %}&paciente={{ request.GET.paciente }}{% endif %}{% if request.GET.dentista %}&dentista={{ request.GET.dentista }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ agendamentos.paginator.num_pages }}{% if request.GET.data_inicio %}&data_inicio={{ request.GET.data_inicio }}{% endif %}{% if request.GET.data_fim %}&data_fim={{ request.GET.data_fim }}{% endif %}{% if request.GET.paciente %}&paciente={{ request.GET.paciente }}{% endif %}{% if request.GET.dentista %}&dentista={{ request.GET.dentista }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" aria-label="Last">
+                                        <span aria-hidden="true">&raquo;&raquo;</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    <div class="text-center text-muted">
+                        Página {{ agendamentos.number }} de {{ agendamentos.paginator.num_pages }} - Total de {{ agendamentos.paginator.count }} registros
+                    </div>
+                </div>
+            {% else %}
+                <div class="p-3 text-center text-muted">
+                    <p class="mb-0">Nenhum agendamento encontrado.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
+
+<script>
+$(function() {
+    $("#busca").autocomplete({
+        source: "{% url 'agendamento:autocomplete_paciente' %}",
+        minLength: 2
+    });
+});
+</script>
+
+{% endblock %}
