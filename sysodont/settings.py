@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-*3xzec8n$)#w*dm)w76y!!p7d8ke^ytz9rods=kih^&*hbvy5t
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['dentalclinic-qfo6.onrender.com']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
