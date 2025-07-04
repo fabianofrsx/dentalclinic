@@ -84,6 +84,7 @@ class Parcela(models.Model):
     numero = models.PositiveIntegerField(verbose_name="Parcela")
     data_vencimento = models.DateField()
     valor = models.DecimalField(max_digits=10, decimal_places=2)
+    valor_pago = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # <== ADICIONADO
     status = models.CharField(max_length=20, choices=[('aberto', 'Aberto'), ('pago', 'Pago')], default="aberto")
     data_pagamento = models.DateField(null=True, blank=True)
     forma_pagamento = models.CharField(max_length=20, choices=FORMA_PAGAMENTO_CHOICES, null=True, blank=True)
