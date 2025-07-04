@@ -267,6 +267,7 @@
                                                     <th>Parcela</th>
                                                     <th>Pagamento</th>
                                                     <th>Valor</th>
+                                                    <th>Valor Pago</th>
                                                     <th>Forma</th>
                                                 </tr>
                                             </thead>
@@ -276,6 +277,7 @@
                                                     <td>#{{ parcela.numero }}</td>
                                                     <td>{{ parcela.data_pagamento|date:"d/m/Y" }}</td>
                                                     <td>R$ {{ parcela.valor|floatformat:2 }}</td>
+                                                    <td>R$ {{ parcela.valor_pago|floatformat:2 }}</td>
                                                     <td>
                                                         <span class="badge bg-light text-dark">
                                                             {{ parcela.get_forma_pagamento_display }}
