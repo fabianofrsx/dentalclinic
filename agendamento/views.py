@@ -62,8 +62,9 @@ def lista_agendamentos(request):
     total = agendamentos_filtrados.count()
     total_agendado = agendamentos_filtrados.filter(status='agendado').count()
     total_atendido = agendamentos_filtrados.filter(status='atendido').count()
-    total_cancelado = agendamentos_filtrados.filter(status='cancelado').count()
-    total_nao_atendido = agendamentos_filtrados.filter(status='nao_atendido').count()
+    total_remarcado = agendamentos_filtrados.filter(status='remarcado').count()
+    total_reagendado = agendamentos_filtrados.filter(status='reagendado').count()
+    total_faltou = agendamentos_filtrados.filter(status='faltou').count()
 
     context = {
         'agendamentos': agendamentos_paginados,
@@ -71,8 +72,9 @@ def lista_agendamentos(request):
         'total': total,
         'total_agendado': total_agendado,
         'total_atendido': total_atendido,
-        'total_cancelado': total_cancelado,
-        'total_nao_atendido': total_nao_atendido,
+        'total_remarcado': total_remarcado,
+        'total_reagendado': total_reagendado,
+        'total_faltou': total_faltou
     }
 
     return render(request, 'agendamento/lista_agendamentos.html', context)
@@ -125,21 +127,18 @@ def editar_agenda(request, pk):
     return render(request, 'agendamento/agendar.html', {'form': form})
 
 def autocomplete_paciente(request):
-    if 'term' in request.GET:
-        termo = request.GET.get('term')
-        qs = Paciente.objects.filter(
-            Q(nome__icontains=termo) | Q(cpf__icontains=termo)
-        )
-        resultados = []
-
-        for paciente in qs:
-            resultados.append({
-                'label': f"{paciente.nome} - {paciente.cpf}",
-                'value': paciente.nome,
-            })
-
-        return JsonResponse(resultados, safe=False)
-    return JsonResponse([], safe=False)
+    term = request.GET.get('term', '')
+    pacientes = Paciente.objects.filter(
+        Q(nome__icontains=term) | Q(cpf__icontains=term)
+    ).values('id', 'nome', 'cpf')[:10]
+    
+    results = [{
+        'id': p['id'],
+        'label': f"{p['nome']} - {p['cpf']}",
+        'value': p['nome']
+    } for p in pacientes]
+    
+    return JsonResponse(results, safe=False)
 
 def cadastro_dentista(request):
     if request.method == 'POST':
@@ -151,3 +150,4 @@ def cadastro_dentista(request):
         form = DentistaForm()
 
     return render(request, 'cadastro_dentista_modal.html', {'form_dentista': form})
+

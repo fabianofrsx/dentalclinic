@@ -51,12 +51,13 @@
             <h5 class="mb-0">Resumo dos Resultados</h5>
         </div>
         <div class="card-body">
-            <div class="row text-center">
-                <div class="col-md-3"><h6>Total de Agendamentos</h6><span class="badge bg-dark fs-5">{{ total }}</span></div>
-                <div class="col-md-2"><h6>Agendado</h6><span class="badge bg-primary fs-5">{{ total_agendado }}</span></div>
-                <div class="col-md-2"><h6>Atendido</h6><span class="badge bg-success fs-5">{{ total_atendido }}</span></div>
-                <div class="col-md-2"><h6>Cancelado</h6><span class="badge bg-danger fs-5">{{ total_cancelado }}</span></div>
-                <div class="col-md-3"><h6>Não Atendido</h6><span class="badge bg-warning text-dark fs-5">{{ total_nao_atendido }}</span></div>
+         <div class="row text-center gy-2 gx-1 justify-content-center">
+             <div class="col-md-2"><h6 class="mb-1">Total</h6><span class="badge bg-dark fs-6">{{ total }}</span></div>
+             <div class="col-md-2"><h6 class="mb-1">Agendado</h6><span class="badge bg-primary fs-6">{{ total_agendado }}</span></div>
+             <div class="col-md-2"><h6 class="mb-1">Atendido</h6><span class="badge bg-success fs-6">{{ total_atendido }}</span></div>
+             <div class="col-md-2"><h6 class="mb-1">Remarcado</h6><span class="badge bg-danger fs-6">{{ total_remarcado }}</span></div>
+             <div class="col-md-2"><h6 class="mb-1">Reagendado</h6><span class="badge bg-warning text-dark fs-6">{{ total_reagendado }}</span></div>
+             <div class="col-md-2"><h6 class="mb-1">Faltou</h6><span class="badge bg-secondary text-white fs-6">{{ total_faltou }}</span></div>
             </div>
         </div>
     </div>
@@ -84,6 +85,7 @@
                                 <th>Paciente</th>
                                 <th>Dentista</th>
                                 <th>Status</th>
+                                <th>Confirmação</th>
                                 <th class="text-center">Ações</th>
                             </tr>
                         </thead>
@@ -97,16 +99,19 @@
                                 <td>
                                     {% if agendamento.status == 'agendado' %}
                                         <span class="badge bg-primary">Agendado</span>
-                                    {% elif agendamento.status == 'cancelado' %}
-                                        <span class="badge bg-danger">Cancelado</span>
+                                    {% elif agendamento.status == 'remarcado' %}
+                                        <span class="badge bg-danger">Remarcado</span>
                                     {% elif agendamento.status == 'atendido' %}
                                         <span class="badge bg-success">Atendido</span>
-                                    {% elif agendamento.status == 'nao_atendido' %}
-                                        <span class="badge bg-warning text-dark">Não Atendido</span>
+                                    {% elif agendamento.status == 'reagendado' %}
+                                        <span class="badge bg-warning text-dark">Reagendado</span>
+                                    {% elif agendamento.status == 'faltou' %}
+                                        <span class="badge bg-warning text-dark">Faltou</span>    
                                     {% else %}
                                         <span class="badge bg-secondary">{{ agendamento.status|capfirst }}</span>
                                     {% endif %}
                                 </td>
+                                <td>{{ agendamento.confirmacao}}</td>
                                 <td class="text-center">
                                     <div class="btn-group btn-group-sm" role="group">
                                         <a href="{% url 'agendamento:editar_agenda' agendamento.id %}" class="btn btn-outline-primary" title="Abrir">

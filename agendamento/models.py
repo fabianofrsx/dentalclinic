@@ -6,6 +6,7 @@ STATUS= [
     ('atendido', 'Atendido'),
     ('remarcado', 'Remarcado'),
     ('reagendado', 'Reagendado'),
+    ('faltou', 'Faltou'),
 ]
 
 STATUS_CORES = {
@@ -13,6 +14,7 @@ STATUS_CORES = {
     'atendido': 'blue',
     'remarcado': 'red',
     'reagendado': 'orange',
+    'faltou': 'yellow',
 }
 
 class Dentista(models.Model):
@@ -28,6 +30,10 @@ class Agendamento(models.Model):
     data = models.DateField()
     hora = models.TimeField()
     status = models.CharField(max_length=20, choices=STATUS, default='agendado')
+    confirmacao = models.BooleanField(
+        choices=[(True, 'Sim'), (False, 'Não')],
+        default=False,
+        verbose_name="Confirmação")
     observacoes = models.TextField(blank=True, null=True)
 
     data_criacao = models.DateTimeField(auto_now_add=True)
