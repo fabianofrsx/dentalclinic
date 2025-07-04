@@ -32,20 +32,10 @@ class AgendamentoForm(forms.ModelForm):
         })
     )
 
-    SIM_NAO = [
-        (True, 'Sim'),
-        (False, 'Não'),
-    ]
-
-    confirmacao = forms.ChoiceField(
-        choices=SIM_NAO,
-        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
-        label="Confirmação"
-    )
-
+    
     class Meta:
         model = Agendamento
-        fields = ['paciente', 'dentista', 'data', 'hora', 'status', 'observacoes']
+        fields = ['paciente', 'dentista', 'data', 'hora', 'status', 'confirmacao','observacoes']
         widgets = {
             'data': forms.DateInput(
                 attrs={
@@ -68,6 +58,10 @@ class AgendamentoForm(forms.ModelForm):
                 'class': 'form-select',
                 'id': 'id_status'
             }),
+            'confirmacao': forms.Select(attrs={
+                'class': 'form-select',
+                'id': 'id_confirmacao'
+            }),
            
             'observacoes': forms.Textarea(attrs={
                 'class': 'form-control',
@@ -83,6 +77,7 @@ class AgendamentoForm(forms.ModelForm):
         self.fields['paciente'].empty_label = 'Selecione um paciente'
         self.fields['dentista'].empty_label = 'Selecione um dentista'
         self.fields['status'].empty_label = 'Selecione o status'
+   
         
 class DentistaForm(forms.ModelForm):
     class Meta:

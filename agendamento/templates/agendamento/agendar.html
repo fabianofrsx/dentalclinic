@@ -10,52 +10,68 @@
                 <i class="fas fa-arrow-left me-1"></i> Voltar
             </a>
         </div>
+        
         <div class="card-body">
             <form method="post" class="needs-validation" novalidate>
                 {% csrf_token %}
+
                 
                 <div class="row mb-4">
-                    <div class="col-md-6 mb-3">
-                        <label for="id_paciente" class="form-label">Paciente*</label>
-                        {{ form.paciente }}
-                    </div>
+    <!-- Coluna 1: Paciente -->
+    <div class="col-md-6 mb-3">
+        <label for="id_paciente" class="form-label">Paciente*</label>
+        {{ form.paciente }}
+    </div>
 
-                    <div class="col-md-6 mb-3">
-                      <label for="id_dentista" class="form-label d-flex justify-content-between align-items-center">
-                          Dentista*
-                          <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalDentista">
-                              <i class="fas fa-user-plus"></i> Novo Dentista
-                          </button>
-                        </label>
-                        {{ form.dentista }}
-                    </div>
+    <!-- Coluna 2: Dentista -->
+    <div class="col-md-6 mb-3">
+        <label for="id_dentista" class="form-label d-flex justify-content-between align-items-center">
+            Dentista*
+            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalDentista">
+                <i class="fas fa-user-plus"></i> Novo Dentista
+            </button>
+        </label>
+        {{ form.dentista }}
+    </div>
+</div>
 
-                </div>
+<div class="row mb-4">
+    <!-- Coluna 1: Data -->
+    <div class="col-md-6 mb-3">
+        <label for="id_data" class="form-label">Data*</label>
+        {{ form.data }}
+    </div>
 
-                <div class="row mb-4">
-                    <div class="col-md-6 mb-3">
-                        <label for="id_data" class="form-label">Data*</label>
-                        {{ form.data }}
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="id_hora" class="form-label">Hora*</label>
-                        {{ form.hora }}
-                    </div>
-                </div>
+    <!-- Coluna 2: Hora -->
+    <div class="col-md-6 mb-3">
+        <label for="id_hora" class="form-label">Hora*</label>
+        {{ form.hora }}
+    </div>
+</div>
 
-                <div class="row mb-4">
-                    <div class="col-md-6 mb-3">
-                        <label for="id_status" class="form-label">Status*</label>
-                        {{ form.status }}
-                    </div>
-                </div>
+<div class="row mb-4">
+    <!-- Coluna 1: Status -->
+    <div class="col-md-6 mb-3">
+        <label for="id_status" class="form-label">Status*</label>
+        {{ form.status }}
+    </div>
 
+    <!-- Coluna 2: Confirmação -->
+    <div class="col-md-6 mb-3">
+     <label for="id_confirmacao" class="form-label">Confirmação*</label>
+     {{ form.confirmacao }}
+    </div>
+</div>
+
+
+                <!-- Observações -->
                 <div class="mb-4">
                     <label for="id_observacoes" class="form-label">Observações</label>
                     {{ form.observacoes }}
                     <div class="form-text">Informe qualquer detalhe relevante para este agendamento</div>
                 </div>
 
+                <!-- Botões de ação -->
                 <div class="d-flex justify-content-end mt-4">
                     <button type="submit" class="btn btn-success px-4">
                         <i class="fas fa-save me-2"></i> Salvar Agendamento
@@ -71,44 +87,35 @@
 
 <!-- Modal Novo Dentista -->
 <div class="modal fade" id="modalDentista" tabindex="-1" aria-labelledby="modalDentistaLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <form id="formDentista" method="post" action="{% url 'agendamento:cadastro_dentista' %}">
-        {% csrf_token %}
-        <div class="modal-header bg-primary text-white">
-          <h5 class="modal-title" id="modalDentistaLabel"><i class="fas fa-user-md me-2"></i>Cadastro de Dentista</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form id="formDentista" method="post" action="{% url 'agendamento:cadastro_dentista' %}">
+                {% csrf_token %}
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="modalDentistaLabel">
+                        <i class="fas fa-user-md me-2"></i>Cadastro de Dentista
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    {{ form_dentista.as_p }}
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save me-1"></i>Salvar
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+            </form>
         </div>
-        <div class="modal-body">
-          {{ form_dentista.as_p }}
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-success"><i class="fas fa-save me-1"></i>Salvar</button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        </div>
-      </form>
     </div>
-  </div>
 </div>
 <!-- Fim Modal -->
-
-
 {% endblock %}
 
 {% block extra_js %}
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
-<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
-
-<script>
-$(function() {
-    $("#busca").autocomplete({
-        source: "{% url 'agendamento:autocomplete_paciente' %}",
-        minLength: 2
-    });
-});
-</script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -132,6 +139,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-
-
 {% endblock %}

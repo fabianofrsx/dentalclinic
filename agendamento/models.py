@@ -17,6 +17,11 @@ STATUS_CORES = {
     'faltou': 'yellow',
 }
 
+CONFIRMACAO_CHOICES = [
+    ('sim', 'Sim'),
+    ('nao', 'Não'),
+]
+
 class Dentista(models.Model):
     nome = models.CharField(max_length=150)
     especialidade = models.CharField(max_length=100, blank=True, null=True)
@@ -30,10 +35,11 @@ class Agendamento(models.Model):
     data = models.DateField()
     hora = models.TimeField()
     status = models.CharField(max_length=20, choices=STATUS, default='agendado')
-    confirmacao = models.BooleanField(
-        choices=[(True, 'Sim'), (False, 'Não')],
-        default=False,
-        verbose_name="Confirmação")
+    confirmacao = models.CharField(
+        max_length=10,
+        choices=CONFIRMACAO_CHOICES,
+        default='nao'
+    )
     observacoes = models.TextField(blank=True, null=True)
 
     data_criacao = models.DateTimeField(auto_now_add=True)

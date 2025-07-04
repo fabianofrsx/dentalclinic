@@ -93,6 +93,7 @@
                   <th>Paciente</th>
                   <th>Dentista</th>
                   <th>Status</th>
+                  <th>Confirmação</th>
                 </tr>
               </thead>
               <tbody>
@@ -114,6 +115,7 @@
                     {% else %}
                     <span class="badge bg-secondary">{{ agendamento.status }}</span>
                     {% endif %}
+                   <td>{{ agendamento.get_confirmacao_display }}</td>
                   </td>
                 </tr>
                 {% empty %}

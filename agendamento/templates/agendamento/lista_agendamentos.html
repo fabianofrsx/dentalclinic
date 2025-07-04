@@ -111,7 +111,7 @@
                                         <span class="badge bg-secondary">{{ agendamento.status|capfirst }}</span>
                                     {% endif %}
                                 </td>
-                                <td>{{ agendamento.confirmacao}}</td>
+                                <td>{{ agendamento.get_confirmacao_display }}</td>
                                 <td class="text-center">
                                     <div class="btn-group btn-group-sm" role="group">
                                         <a href="{% url 'agendamento:editar_agenda' agendamento.id %}" class="btn btn-outline-primary" title="Abrir">
