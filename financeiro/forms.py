@@ -62,13 +62,18 @@ class CaixaForm(forms.ModelForm):
 class ParcelaReceberForm(forms.ModelForm):
     class Meta:
         model = Parcela
-        fields = ['status', 'data_pagamento', 'forma_pagamento', 'observacao']
+        fields = ['valor_pago', 'status', 'data_pagamento', 'forma_pagamento', 'observacao']
         widgets = {
+            'valor_pago': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.01',
+                'min': '0',
+            }),
             'status': forms.Select(attrs={'class': 'form-control'}),
             'data_pagamento': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'forma_pagamento': forms.Select(attrs={'class': 'form-control'}),
             'observacao': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-        } 
+        }
 
 class PlanoForm(forms.ModelForm):
     class Meta:

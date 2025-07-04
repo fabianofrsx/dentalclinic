@@ -69,7 +69,6 @@
                 <div class="card-body">
                     <form method="post" class="needs-validation" novalidate>
                         {% csrf_token %}
-                        
                         <div class="form-section mb-4">
                             <h6 class="section-title">
                                 <i class="fas fa-credit-card mr-2"></i>
@@ -77,36 +76,29 @@
                             </h6>
                             <div class="section-content">
                                 <div class="row">
-                                    <!-- Campo de valor manual -->
+                                    <!-- Campo valor_pago manual -->
                                     <div class="form-group col-md-6 mb-3">
-                                        <label for="valor_pago" class="form-label">
+                                        <label for="{{ form.valor_pago.id_for_label }}" class="form-label">
                                             Valor Recebido
                                             <span class="text-danger">*</span>
                                         </label>
                                         <div class="input-group">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text">R$</span>
-                                            </div>
-                                            <input type="number" 
-                                                   class="form-control" 
-                                                   id="valor_pago" 
-                                                   name="valor_pago" 
-                                                   step="0.01"
-                                                   min="0"
-                                                   value="{{ parcela.valor|floatformat:2 }}"
-                                                   required>
+                                          <span class="input-group-text">R$</span>
+                                          {{ form.valor_pago }}
                                         </div>
                                         <small class="form-text text-muted">
                                             Valor original: R$ {{ parcela.valor|floatformat:2 }}
                                         </small>
-                                        <div class="invalid-feedback">
-                                            Por favor, informe um valor válido.
-                                        </div>
+                                        {% if form.valor_pago.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.valor_pago.errors.0 }}
+                                            </div>
+                                        {% endif %}
                                     </div>
-                                    
-                                    <!-- Demais campos do formulário -->
+
+                                    <!-- Renderiza demais campos exceto valor_pago -->
                                     {% for field in form %}
-                                        {% if field.name != 'valor' %}  <!-- Exclui o campo valor original se existir -->
+                                        {% if field.name != 'valor_pago' %}
                                         <div class="form-group col-md-6 mb-3">
                                             <label for="{{ field.id_for_label }}" class="form-label">
                                                 {{ field.label }}
@@ -250,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, false);
     });
     
-    // Máscara para o campo de valor
+    // Máscara simples para o campo valor_pago
     var valorPagoInput = document.getElementById('valor_pago');
     if (valorPagoInput) {
         valorPagoInput.addEventListener('change', function() {

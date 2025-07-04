@@ -32,10 +32,10 @@ class AgendamentoForm(forms.ModelForm):
         })
     )
 
-    
+        
     class Meta:
         model = Agendamento
-        fields = ['paciente', 'dentista', 'data', 'hora', 'status', 'confirmacao','observacoes']
+        fields = ['paciente', 'dentista', 'data', 'hora', 'status','confirmacao', 'observacoes']
         widgets = {
             'data': forms.DateInput(
                 attrs={
@@ -59,10 +59,9 @@ class AgendamentoForm(forms.ModelForm):
                 'id': 'id_status'
             }),
             'confirmacao': forms.Select(attrs={
-                'class': 'form-select',
-                'id': 'id_confirmacao'
+            'class': 'form-select',
+            'id': 'id_confirmacao'
             }),
-           
             'observacoes': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 3,
@@ -77,7 +76,6 @@ class AgendamentoForm(forms.ModelForm):
         self.fields['paciente'].empty_label = 'Selecione um paciente'
         self.fields['dentista'].empty_label = 'Selecione um dentista'
         self.fields['status'].empty_label = 'Selecione o status'
-   
         
 class DentistaForm(forms.ModelForm):
     class Meta:

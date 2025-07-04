@@ -12,8 +12,7 @@ urlpatterns = [
     path('lista/pdf/', views.agendamentos_pdf, name='agendamentos_pdf'),
     path('editar/<int:pk>/', views.editar_agenda, name='editar_agenda'),
     path('excluir/<int:pk>/', views.excluir_agenda, name='excluir_agenda'),
-    path('autocomplete/', views.autocomplete_paciente, name='autocomplete_paciente'),
+    path('autocomplete-paciente/', views.autocomplete_paciente, name='autocomplete_paciente'),
     path('cadastro-dentista/', views.cadastro_dentista, name='cadastro_dentista'),
-
-        
+           
 ]

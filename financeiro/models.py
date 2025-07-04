@@ -54,16 +54,22 @@ class Contrato(models.Model):
             )
 
      if parcelas_pagas.exists():
-        html += "<h4 style='color: #3c763d;'>🟢 Parcelas Pagas</h4>"
-        for p in parcelas_pagas:
-            link = f"/admin/financeiro/parcela/{p.id}/change/"
-            html += (
-                f"<div style='margin-bottom: 5px; background-color:#dff0d8; padding:10px; border-radius:5px;'>"
-                f"<strong>Venc:</strong> {p.data_vencimento} | "
-                f"<strong>Valor:</strong> R$ {p.valor} | "
-                f"<strong>Status:</strong> Pago | "
-                f"<a href='{link}' target='_blank'>Visualizar</a></div>"
-            )
+       html += "<h4 style='color: #3c763d;'>🟢 Parcelas Pagas</h4>"
+     for p in parcelas_pagas:
+        link = f"/admin/financeiro/parcela/{p.id}/change/"
+        valor_pago = p.valor_pago if p.valor_pago is not None else p.valor
+        data_pagamento = p.data_pagamento.strftime('%d/%m/%Y') if p.data_pagamento else "-"
+        forma_pagamento = dict(p.FORMA_PAGAMENTO_CHOICES).get(p.forma_pagamento, '-') if p.forma_pagamento else "-"
+
+        html += (
+            f"<div style='margin-bottom: 5px; background-color:#dff0d8; padding:10px; border-radius:5px;'>"
+            f"<strong>Venc:</strong> {p.data_vencimento.strftime('%d/%m/%Y')} | "
+            f"<strong>Pago em:</strong> {data_pagamento} | "
+            f"<strong>Forma:</strong> {forma_pagamento} | "
+            f"<strong>Valor:</strong> R$ {valor_pago:.2f} | "
+            f"<strong>Status:</strong> Pago | "
+            f"<a href='{link}' target='_blank'>Visualizar</a></div>"
+        )
 
      if not html:
         html = "Nenhuma parcela cadastrada."
@@ -75,7 +81,8 @@ class Contrato(models.Model):
 class Parcela(models.Model):
     FORMA_PAGAMENTO_CHOICES = [
         ('dinheiro', 'Dinheiro'),
-        ('pix', 'Pix'),
+        ('pix_pj', 'Pix PJ'),
+        ('pix_pf', 'Pix PF'),
         ('cartao_credito', 'Cartão de crédito'),
         ('cartao_debito', 'Cartão de débito'),
     ]
@@ -89,6 +96,12 @@ class Parcela(models.Model):
     data_pagamento = models.DateField(null=True, blank=True)
     forma_pagamento = models.CharField(max_length=20, choices=FORMA_PAGAMENTO_CHOICES, null=True, blank=True)
     observacao = models.TextField(blank=True)
+
+    @property
+    def dias_atraso(self):
+        if self.status != 'pago' and self.data_vencimento < date.today():
+            return (date.today() - self.data_vencimento).days
+        return 0
 
     def __str__(self):
         return f"Parcela {self.numero} - {self.contrato.numero_contrato}"
@@ -105,7 +118,8 @@ class Caixa(models.Model):
 
     FORMA_CHOICES = [
         ('dinheiro', 'Dinheiro'),
-        ('pix', 'Pix'),
+        ('pix_pj', 'Pix PJ'),
+        ('pix_pf', 'Pix PF'),
         ('cartao_credito', 'Cartão de crédito'),
         ('cartao_debito', 'Cartão de débito'),
     ]

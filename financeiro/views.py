@@ -171,7 +171,7 @@ def contrato_excluir(request, pk):
 
 def parcela_receber(request, parcela_id):
     parcela = get_object_or_404(Parcela, id=parcela_id)
-    paciente = parcela.contrato.paciente  # Ajuste conforme seu modelo
+    paciente = parcela.contrato.paciente
 
     if request.method == 'POST':
         form = ParcelaReceberForm(request.POST, instance=parcela)

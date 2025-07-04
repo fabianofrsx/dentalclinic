@@ -42,13 +42,14 @@ def gerar_parcelas_contrato(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=Parcela)
 def lancar_entrada_caixa(sender, instance, created, **kwargs):
-    if instance.status and not created:
-        # Garante que não lance duplicado
-        descricao = f"Recebimento do plano {instance.contrato} - Parcela {instance.id}"
+    if instance.status == 'pago' and not created:
+        descricao = f"Recebimento do plano {instance.contrato} - Parcela {instance.numero}"
+
+        valor_entrada = instance.valor_pago if instance.valor_pago is not None else instance.valor
 
         existe = Caixa.objects.filter(
             descricao=descricao,
-            valor=instance.valor,
+            valor=valor_entrada,
             tipo='entrada',
             forma=instance.forma_pagamento,
         ).exists()
@@ -57,7 +58,7 @@ def lancar_entrada_caixa(sender, instance, created, **kwargs):
             Caixa.objects.create(
                 data=instance.data_pagamento,
                 descricao=descricao,
-                valor=instance.valor,
+                valor=valor_entrada,
                 tipo='entrada',
                 forma=instance.forma_pagamento,
                 plano_conta='planos',

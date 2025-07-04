@@ -62,9 +62,8 @@ def lista_agendamentos(request):
     total = agendamentos_filtrados.count()
     total_agendado = agendamentos_filtrados.filter(status='agendado').count()
     total_atendido = agendamentos_filtrados.filter(status='atendido').count()
-    total_remarcado = agendamentos_filtrados.filter(status='remarcado').count()
-    total_reagendado = agendamentos_filtrados.filter(status='reagendado').count()
-    total_faltou = agendamentos_filtrados.filter(status='faltou').count()
+    total_cancelado = agendamentos_filtrados.filter(status='cancelado').count()
+    total_nao_atendido = agendamentos_filtrados.filter(status='nao_atendido').count()
 
     context = {
         'agendamentos': agendamentos_paginados,
@@ -72,9 +71,8 @@ def lista_agendamentos(request):
         'total': total,
         'total_agendado': total_agendado,
         'total_atendido': total_atendido,
-        'total_remarcado': total_remarcado,
-        'total_reagendado': total_reagendado,
-        'total_faltou': total_faltou
+        'total_cancelado': total_cancelado,
+        'total_nao_atendido': total_nao_atendido,
     }
 
     return render(request, 'agendamento/lista_agendamentos.html', context)

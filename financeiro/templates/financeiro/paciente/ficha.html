@@ -217,7 +217,6 @@
                                                     <th>Parcela</th>
                                                     <th>Vencimento</th>
                                                     <th>Valor</th>
-                                                    <th>Dias</th>
                                                     <th>Ação</th>
                                                 </tr>
                                             </thead>
@@ -231,15 +230,7 @@
                                                         </span>
                                                     </td>
                                                     <td>R$ {{ parcela.valor|floatformat:2 }}</td>
-                                                    
-                                                    <td>
-                                                      {% if parcela.dias_atraso > 0 %}
-                                                      <span class="text-danger fw-bold">{{ parcela.dias_atraso }} dias</span>
-                                                      {% else %}
-                                                       -
-                                                      {% endif %}
-                                                    </td>
-                                                    
+                                                                                                                                                           
                                                     <td>
                                                         <a href="{% url 'financeiro:parcela_receber' parcela.id %}" class="btn btn-sm btn-outline-primary">
                                                             <i class="fas fa-hand-holding-usd"></i> Receber

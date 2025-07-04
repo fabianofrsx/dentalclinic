@@ -22,5 +22,5 @@ urlpatterns = [
     path('caixa/excluir/<int:pk>/', views.excluir_caixa, name='excluir_caixa'),
     path('contrato/<int:contrato_id>/carne/', views.gerar_carne_pdf, name='gerar_carne_pdf'),
     path('plano/editar/<int:pk>/', views.plano_editar, name='plano_editar'),
-     path('parcela/relatorio-parcelas/', views.relatorio_parcelas, name='relatorio_parcelas'),
+    path('parcela/relatorio-parcelas/', views.relatorio_parcelas, name='relatorio_parcelas'),
 ]
