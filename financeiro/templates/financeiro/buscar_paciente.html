@@ -1,0 +1,70 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Resultados da Busca{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Resultados da busca por "{{ query }}"</h2>
+
+    <form method="get" action="">
+        <input
+          id="autocomplete-busca"
+          class="form-control me-2 mb-3"
+          type="search"
+          placeholder="Pesquisar paciente por nome ou CPF"
+          aria-label="Pesquisar"
+          name="q"
+          value="{{ query }}"
+          autocomplete="on"
+        />
+    </form>
+
+    {% if pacientes %}
+        <table class="table table-striped mt-3">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>CPF</th>
+                    <th>Telefone</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>                
+                {% for paciente in pacientes %}
+                <tr>
+                    <td>{{ paciente.nome }}</td>
+                    <td>{{ paciente.cpf }}</td>
+                    <td>{{ paciente.telefone }}</td>
+                    <td>
+                        <a href="{% url 'financeiro:paciente_ficha' paciente.id %}" class="btn btn-sm btn-primary">Abrir Ficha</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="mt-3">Nenhum paciente encontrado para "{{ query }}".</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+  {% block scripts %}
+  {{ block.super }}
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
+  <script>
+  $(function() {
+      $("#autocomplete-busca").autocomplete({
+          source: "{% url 'financeiro:autocomplete_paciente' %}",
+          minLength: 2,
+          select: function(event, ui) {
+              if(ui.item && ui.item.id) {
+                  window.location.href = "/financeiro/paciente/" + ui.item.id + "/";
+              }
+          }
+      });
+  });
+  </script>
+{% endblock %}

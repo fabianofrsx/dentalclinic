@@ -1,0 +1,263 @@
+{% extends 'core/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Registrar Pagamento - Parcela #{{ parcela.numero }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="h4 font-weight-bold text-primary">
+                    <i class="fas fa-hand-holding-usd mr-2"></i>
+                    Registrar Pagamento
+                </h2>
+                <a href="{% url 'financeiro:paciente_ficha' parcela.contrato.paciente.id %}" 
+                   class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-arrow-left mr-1"></i> Voltar
+                </a>
+            </div>
+
+            <!-- Card dos detalhes da parcela -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-primary text-white py-3">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-file-invoice-dollar fa-lg mr-3"></i>
+                        <div>
+                            <h5 class="mb-0 font-weight-bold">Detalhes da Parcela</h5>
+                            <small class="font-weight-light">Contrato: {{ parcela.contrato }}</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="detail-item mb-3">
+                                <span class="detail-label">Número da Parcela</span>
+                                <span class="detail-value">{{ parcela.numero }}</span>
+                            </div>
+                            <div class="detail-item mb-3">
+                                <span class="detail-label">Valor Original</span>
+                                <span class="detail-value">R$ {{ parcela.valor|floatformat:2 }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-item mb-3">
+                                <span class="detail-label">Data de Vencimento</span>
+                                <span class="detail-value">{{ parcela.data_vencimento|date:"d/m/Y" }}</span>
+                            </div>
+                            <div class="detail-item mb-3">
+                                <span class="detail-label">Status</span>
+                                <span class="badge badge-{% if parcela.status == 'pago' %}success{% else %}warning{% endif %}">
+                                    {{ parcela.get_status_display }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card do formulário de recebimento -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="mb-0 font-weight-bold d-flex align-items-center">
+                        <i class="fas fa-cash-register mr-3"></i>
+                        <span>Registrar Pagamento</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        <div class="form-section mb-4">
+                            <h6 class="section-title">
+                                <i class="fas fa-credit-card mr-2"></i>
+                                Dados do Pagamento
+                            </h6>
+                            <div class="section-content">
+                                <div class="row">
+                                    <!-- Campo valor_pago manual -->
+                                    <div class="form-group col-md-6 mb-3">
+                                        <label for="{{ form.valor_pago.id_for_label }}" class="form-label">
+                                            Valor Recebido
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group">
+                                          <span class="input-group-text">R$</span>
+                                          {{ form.valor_pago }}
+                                        </div>
+                                        <small class="form-text text-muted">
+                                            Valor original: R$ {{ parcela.valor|floatformat:2 }}
+                                        </small>
+                                        {% if form.valor_pago.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.valor_pago.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Renderiza demais campos exceto valor_pago -->
+                                    {% for field in form %}
+                                        {% if field.name != 'valor_pago' %}
+                                        <div class="form-group col-md-6 mb-3">
+                                            <label for="{{ field.id_for_label }}" class="form-label">
+                                                {{ field.label }}
+                                                {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+                                            </label>
+                                            {{ field }}
+                                            {% if field.help_text %}
+                                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                                            {% endif %}
+                                            <div class="invalid-feedback">
+                                                Por favor, preencha este campo corretamente.
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions pt-4 border-top">
+                            <div class="d-flex justify-content-between">
+                                <button type="reset" class="btn btn-outline-secondary">
+                                    <i class="fas fa-eraser mr-2"></i>Limpar
+                                </button>
+                                <div>
+                                    <a href="{% url 'financeiro:paciente_ficha' parcela.contrato.paciente.id %}" 
+                                       class="btn btn-outline-danger mr-2">
+                                        <i class="fas fa-times mr-2"></i>Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-success px-4">
+                                        <i class="fas fa-check-circle mr-2"></i>Confirmar Pagamento
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 0.5rem;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+    
+    .card-header {
+        border-bottom: none;
+    }
+    
+    .detail-item {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .detail-label {
+        font-size: 0.85rem;
+        color: #6c757d;
+        font-weight: 500;
+    }
+    
+    .detail-value {
+        font-size: 1rem;
+        color: #343a40;
+        font-weight: 600;
+    }
+    
+    .section-title {
+        color: #495057;
+        font-weight: 600;
+        border-bottom: 1px solid #e9ecef;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-control, .custom-select {
+        border-radius: 0.35rem;
+        padding: 0.75rem 1rem;
+        border: 1px solid #ced4da;
+        transition: all 0.2s;
+    }
+    
+    .form-control:focus, .custom-select:focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    
+    .input-group-text {
+        background-color: #f8f9fa;
+    }
+    
+    .btn {
+        font-weight: 500;
+        border-radius: 0.35rem;
+        transition: all 0.2s;
+    }
+    
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+    
+    .btn-success:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+    }
+    
+    .invalid-feedback {
+        display: none;
+        width: 100%;
+        margin-top: 0.25rem;
+        font-size: 80%;
+        color: #dc3545;
+    }
+    
+    .was-validated .form-control:invalid ~ .invalid-feedback {
+        display: block;
+    }
+    
+    .form-actions {
+        padding-top: 1.5rem;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Validação do formulário
+    var forms = document.querySelectorAll('.needs-validation');
+    
+    Array.prototype.slice.call(forms).forEach(function(form) {
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            form.classList.add('was-validated');
+        }, false);
+    });
+    
+    // Máscara simples para o campo valor_pago
+    var valorPagoInput = document.getElementById('valor_pago');
+    if (valorPagoInput) {
+        valorPagoInput.addEventListener('change', function() {
+            var value = parseFloat(this.value);
+            if (isNaN(value) || value < 0) {
+                this.value = "{{ parcela.valor|floatformat:2 }}";
+            } else {
+                this.value = value.toFixed(2);
+            }
+        });
+        
+        valorPagoInput.addEventListener('keyup', function() {
+            this.value = this.value.replace(/[^0-9.]/g, '');
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends "admin/base.html" %}
+{% block title %}SysOdont Admin{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">SysOdont</a> |
+    <a href="{% url 'calendario' %}" target="_blank" style="font-size: 16px;">🗓️ Ver Calendário</a>
+</h1>
+{% endblock %}

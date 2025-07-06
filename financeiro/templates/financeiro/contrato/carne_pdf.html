@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Carnê de Pagamento</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 5mm;
+            
+        }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 9pt;
+            margin: 0;
+            padding: 0;
+        }
+        .page {
+            width: 100%;
+            page-break-after: always;
+        }
+        .boleto-container {
+            width: 190mm;
+            height: 70mm;
+            margin-bottom: 5mm;
+            border: 1px dashed #999;
+            box-sizing: border-box;
+            
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            height: 100%;
+            
+        }
+        td {
+            border: 1px solid #000;
+            padding: 2px;
+            vertical-align: top;
+            
+        }
+        .label {
+            font-weight: bold;
+            font-size: 9pt;
+        }
+        .value {
+            font-size: 9pt;
+        }
+        .col-esquerda {
+            width: 20%;
+        }
+        .col-central {
+            width: 60%;
+        }
+        .col-direita {
+            width: 20%;
+        }
+        p {
+            margin: 2px 0;
+            
+        }
+    </style>
+</head>
+<body>
+
+<div id="page-content">
+    {% for parcela in parcelas %}
+        <div class="page">
+        
+        <div class="boleto-container">
+            <table>
+                <tr>
+                    <!-- Coluna Esquerda -->
+                    <td class="col-esquerda">
+                        <p><span class="label">CONTRATO:</span><br/><span class="value">{{ contrato.id }}</span></p>
+                        <p><span class="label">PARCELA:</span><br/><span class="value">{{ parcela.numero }}/{{ parcela.total }}</span></p>
+                        <p><span class="label">VENCIMENTO:</span><br/><span class="value">{{ parcela.data_vencimento }}</span></p>
+                        <p><span class="label">VALOR DO DOCUMENTO:</span><br/><span class="value">R$ {{ parcela.valor|floatformat:2 }}</span></p>
+                        <p><span class="label">(-) DESCONTOS:</span><br/><span class="value">R$ </span></p>
+                        <p><span class="label">(+) MULTA/MORA:</span><br/><span class="value">R$ </span></p>
+                        <p><span class="label">(=) TOTAL:</span><br/><span class="value">R$ </span></p>
+                    </td>
+
+                    <!-- Coluna Central -->
+                    <td class="col-central">
+                        <p><span class="label">LOCAL DE PAGAMENTO:</span><br/><span class="value">PAGÁVEL NA LOJA ATÉ O VENCIMENTO</span></p>
+                        <p><span class="label">CEDENTE:</span><br/><span class="value">DENTAL CLINIC</span></p>
+                        <p><span class="label">INSTRUÇÕES:</span><br/>
+                            <span class="value">
+                                1. Não receber após o vencimento<br/>
+                                2. Multa de 2% após vencimento<br/>
+                                3. Mora de R$ 0,33/dia após vencimento
+                            </span>
+                        </p>
+                        <p><span class="label">SACADO:</span><br/>
+                            <span class="value">
+                                {{ paciente.nome }}<br/>
+                                CPF: {{ paciente.cpf }}<br/>
+                                Endereço: {{ paciente.endereco }}
+                            </span>
+                        </p>
+                    </td>
+
+                    <!-- Coluna Direita -->
+                    <td class="col-direita">
+                        <p><span class="label">CONTRATO:</span><br/><span class="value">{{ contrato.id }}</span></p>
+                        <p><span class="label">PARCELA:</span><br/><span class="value">{{ parcela.numero }}/{{ parcela.total }}</span></p>
+                        <p><span class="label">VENCIMENTO:</span><br/><span class="value">{{ parcela.data_vencimento }}</span></p>
+                        <p><span class="label">VALOR DO DOCUMENTO:</span><br/><span class="value">R$ {{ parcela.valor|floatformat:2 }}</span></p>
+                        <p><span class="label">(-) DESCONTOS:</span><br/><span class="value">R$ </span></p>
+                        <p><span class="label">(+) MULTA/MORA:</span><br/><span class="value">R$ </span></p>
+                        <p><span class="label">(=) TOTAL:</span><br/><span class="value">R$ </span></p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        
+        </div>
+        
+    {% endfor %}
+</div>
+
+</body>
+</html>

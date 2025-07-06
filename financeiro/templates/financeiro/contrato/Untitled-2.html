@@ -1,0 +1,116 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>CARNE</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 9px;
+            margin: 0;
+            padding: 5mm;
+        }
+        .page {
+            width: 210mm;
+            height: 297mm;
+            display: flex;
+            flex-wrap: wrap;
+            align-content: flex-start;
+        }
+        .boleto-container {
+            width: 190mm;
+            height: 70mm;
+            margin: 2mm;
+            border: 1px dashed #ccc;
+            box-sizing: border-box;
+            page-break-inside: avoid;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            height: 100%;
+        }
+        td {
+            border: 1px solid #000;
+            vertical-align: top;
+            padding: 1px;
+        }
+        .header {
+            font-weight: bold;
+            text-align: center;
+            background-color: #f0f0f0;
+        }
+        
+        .label {
+            font-weight: bold;
+            font-size: 11px;
+        }
+        .value {
+            font-size: 11px;
+        }
+        .col-left {
+            width: 20%;
+        }
+        .col-middle {
+            width: 60%;
+        }
+        .col-right {
+            width: 20%;
+        }
+        
+    </style>
+</head>
+<body>
+
+<div class="page">
+    <!-- Primeiro Boleto -->
+    <div class="boleto-container">
+      <table height="215" border="0" cellspacing="0" cellpadding="0">
+                        
+            <tr>
+                <!-- Coluna Esquerda -->
+                <td height="215" class="col-left">
+                    <table width="100" height="100">
+                        <tr><td height="35"><span class="label">CONTRATO:</span><br><span class="value">100</span></td></tr>
+                        <tr><td height="35"><span class="label">PARCELA</span><br><span class="value">1/12</span></td></tr>
+                        <tr><td height="35"><span class="label">VENCIMENTO</span><br><span class="value">10/06/2025</span></td></tr>
+                        <tr><td height="35"><span class="label">VALOR DO DOCUMENTO</span><br><span class="value">R$ 100,00</span></td></tr>
+                        <tr><td height="35"><span class="label">(-) DESCONTOS</span><br><span class="value">&nbsp;</span></td></tr>
+                        <tr><td height="35"><span class="label">(+) MULTA/MORA</span><br><span class="value">&nbsp;</span></td></tr>
+                        <tr><td height="35"><span class="label">(=) TOTAL</span><br><span class="value">&nbsp;</span></td></tr>
+                    </table>
+                </td>
+                
+                <!-- Coluna Central -->
+                <td class="col-middle">
+                    <table width="100" height="100">
+                        <tr><td height="40"><span class="label">LOCAL DE PAGAMENTO:</span><br><span class="value">Pagável em qualquer banco até o vencimento</td></tr>
+                        <tr><td height="55"><span class="label">CEDENTE:</span><br><span class="value">Empresa Exemplo Ltda<br><span class="value">CNPJ: 00.000.000/0000-00</td></tr>
+                        <tr><td height="100"><span class="label">INSTRUÇÕES:</span><br><span class="value">1. Não receber após o vencimento<br><span class="value">2. Multa de 2% após vencimento</td></tr>
+                        <tr><td height="58"><span class="label">SACADO:</span><br><span class="value">Cliente Exemplo<br><span class="value">CPF: 000.000.000-00<br><span class="value">Endereço: Rua Teste, 123</td></tr>
+                    </table>
+              </td>
+                
+                <!-- Coluna Direita -->
+                <td height="215" class="col-right">
+                    <table width="100" height="100">
+                        <tr><td height="35"><span class="label">CONTRATO:</span><br><span class="value">100</span></td></tr>
+                        <tr><td height="35"><span class="label">PARCELA</span><br><span class="value">1/12</span></td></tr>
+                        <tr><td height="35"><span class="label">VENCIMENTO</span><br><span class="value">10/06/2025</span></td></tr>
+                        <tr><td height="35"><span class="label">VALOR DO DOCUMENTO</span><br><span class="value">R$ 100,00</span></td></tr>
+                        <tr><td height="35"><span class="label">(-) DESCONTOS</span><br><span class="value">&nbsp;</span></td></tr>
+                        <tr><td height="35"><span class="label">(+) MULTA/MORA</span><br><span class="value">&nbsp;</span></td></tr>
+                        <tr><td height="35"><span class="label">(=) TOTAL</span><br><span class="value">&nbsp;</span></td></tr>
+                    </table>
+                </td>
+          </tr>
+            
+        </table>
+</div>
+
+</body>
+</html>

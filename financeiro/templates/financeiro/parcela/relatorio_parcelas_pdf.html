@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório de Parcelas - DENTAL CLINIC</title>
+    <style>
+        @page {
+            size: landscape;
+            margin: 1.5cm;
+        }
+        body { 
+            font-family: Arial, sans-serif;
+            color: #333;
+            line-height: 1.4;
+        }
+        .header { 
+            text-align: center; 
+            margin-bottom: 20px;
+        }
+        .header h1 { 
+            margin: 0 0 5px 0; 
+            font-size: 20px;
+            color: #444;
+            font-weight: bold;
+        }
+        .header .clinic-name {
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        .header .periodo {
+            font-size: 12px;
+            background-color: #f0f0f0;
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 11px;
+        }
+        th, td {
+            padding: 8px 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f0f0f0;
+            color: #333;
+            font-weight: bold;
+            text-align: center;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:nth-child(odd) {
+            background-color: #fff;
+        }
+        tr:hover {
+            background-color: #f0f0f0;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .badge-pago {
+            color: white;
+            background-color: #2e7d32;
+        }
+        .badge-atrasado {
+            color: white;
+            background-color: #c62828;
+        }
+        .badge-aberto {
+            color: #212529;
+            background-color: #ffc107;
+        }
+        .text-danger {
+            color: #c62828;
+            font-weight: bold;
+        }
+        .footer {
+            text-align: right;
+            font-size: 10px;
+            color: #777;
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+        }
+        .summary {
+            font-size: 11px;
+            margin-bottom: 15px;
+            padding: 8px 12px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        .valor-negativo {
+            color: #c62828;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>RELATÓRIO DE PARCELAS</h1>
+        <div class="clinic-name">DENTAL CLINIC</div>
+        <div class="periodo">
+            Emitido em {% now "d/m/Y" %}
+        </div>
+    </div>
+
+    <div class="summary">
+        <strong>Filtros aplicados:</strong> 
+        {% if status %} Status: {{ status|title }} |{% endif %}
+        {% if data_inicio %} Período: {{ data_inicio|date:"d/m/Y" }} a {{ data_fim|date:"d/m/Y" }}{% endif %}
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th width="10%">Contrato</th>
+                <th width="20%">Paciente</th>
+                <th width="8%">Parcela</th>
+                <th width="12%" class="text-right">Valor (R$)</th>
+                <th width="12%">Vencimento</th>
+                <th width="10%">Status</th>
+                <th width="16%">Forma Pagamento</th>
+                <th width="12%" class="text-right">Dias Atraso</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p, atraso in parcelas_list %}
+            <tr>
+                <td>{{ p.contrato.numero_contrato }}</td>
+                <td>{{ p.contrato.paciente.nome }}</td>
+                <td class="text-center">{{ p.numero }}</td>
+                <td class="text-right">{{ p.valor|floatformat:2 }}</td>
+                <td>
+                    {% if p.data_vencimento < today and p.status != 'pago' %}
+                        <span class="text-danger">{{ p.data_vencimento|date:"d/m/Y" }}</span>
+                    {% else %}
+                        {{ p.data_vencimento|date:"d/m/Y" }}
+                    {% endif %}
+                </td>
+                <td class="text-center">
+                    {% if p.status == 'pago' %}
+                        <span class="badge badge-pago">Pago</span>
+                    {% elif p.data_vencimento < today %}
+                        <span class="badge badge-atrasado">Atrasado</span>
+                    {% else %}
+                        <span class="badge badge-aberto">Aberto</span>
+                    {% endif %}
+                </td>
+                <td>{{ p.get_forma_pagamento_display|default:"-" }}</td>
+                <td class="text-right">
+                    {% if atraso > 0 %}
+                        <span class="text-danger">{{ atraso }}</span>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="text-center" style="padding: 15px;">
+                    Nenhuma parcela encontrada com os critérios selecionados
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="footer">
+        Página 1 de 1 | Emitido em {% now "d/m/Y H:i" %} | DENTAL CLINIC &copy; {% now "Y" %}
+    </div>
+
+</body>
+</html>

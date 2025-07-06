@@ -1,0 +1,226 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-user-plus me-2"></i>Cadastro de Paciente</h2>
+        <a href="{% url 'paciente:listar_pacientes' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Voltar
+        </a>
+    </div>
+
+    <form method="post" class="needs-validation" novalidate>
+        {% csrf_token %}
+        
+        <!-- Dados Pessoais -->
+        <div class="card shadow mb-4">
+            <div class="card-header bg-primary text-white">
+                <i class="fas fa-id-card me-2"></i>Dados Pessoais
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8 mb-3">
+                        <label for="id_nome" class="form-label">Nome Completo*</label>
+                        {{ form.nome }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_cpf" class="form-label">CPF*</label>
+                        {{ form.cpf }}
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label for="id_data_nascimento" class="form-label">Data Nascimento*</label>
+                        {{ form.data_nascimento }}
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="id_sexo" class="form-label">Sexo*</label>
+                        {{ form.sexo }}
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="id_estado_civil" class="form-label">Estado Civil</label>
+                        {{ form.estado_civil }}
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="id_profissao" class="form-label">Profissão</label>
+                        {{ form.profissao }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dados Familiares -->
+        <div class="card shadow mb-4">
+            <div class="card-header bg-primary text-white">
+                <i class="fas fa-users me-2"></i>Filiação
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="id_nome_mae" class="form-label">Nome da Mãe</label>
+                        {{ form.nome_mae }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="id_nome_pai" class="form-label">Nome do Pai</label>
+                        {{ form.nome_pai }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="id_naturalidade" class="form-label">Naturalidade</label>
+                        {{ form.naturalidade }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="id_nacionalidade" class="form-label">Nacionalidade</label>
+                        {{ form.nacionalidade }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contato -->
+        <div class="card shadow mb-4">
+            <div class="card-header bg-primary text-white">
+                <i class="fas fa-phone-alt me-2"></i>Contato
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="id_telefone" class="form-label">Telefone*</label>
+                        {{ form.telefone }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="id_observacao_contato" class="form-label">Observações de Contato</label>
+                        {{ form.observacao_contato }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Endereço -->
+        <div class="card shadow mb-4">
+            <div class="card-header bg-primary text-white">
+                <i class="fas fa-map-marker-alt me-2"></i>Endereço
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label for="id_cep" class="form-label">CEP</label>
+                        {{ form.cep }}
+                    </div>
+                    <div class="col-md-7 mb-3">
+                        <label for="id_endereco" class="form-label">Endereço</label>
+                        {{ form.endereco }}
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label for="id_numero" class="form-label">Número</label>
+                        {{ form.numero }}
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="id_bairro" class="form-label">Bairro</label>
+                        {{ form.bairro }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_cidade" class="form-label">Cidade</label>
+                        {{ form.cidade }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_uf" class="form-label">UF</label>
+                        {{ form.uf }}
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="id_complemento" class="form-label">Complemento</label>
+                        {{ form.complemento }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="id_ponto_referencia" class="form-label">Ponto de Referência</label>
+                        {{ form.ponto_referencia }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Outras Informações -->
+        <div class="card shadow mb-4">
+            <div class="card-header bg-primary text-white">
+                <i class="fas fa-info-circle me-2"></i>Outras Informações
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="id_outras_observacoes" class="form-label">Observações Gerais</label>
+                    {{ form.outras_observacoes }}
+                </div>
+            </div>
+        </div>
+
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-4">
+            <button type="submit" class="btn btn-success me-md-2">
+                <i class="fas fa-save me-1"></i> Salvar
+            </button>
+            <a href="{% url 'paciente:listar_pacientes' %}" class="btn btn-secondary">
+                <i class="fas fa-times me-1"></i> Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+{% block extra_js %}
+<script>
+// Máscaras para CPF, Telefone e CEP
+document.addEventListener('DOMContentLoaded', function() {
+    // Máscara para CPF
+    const cpfField = document.getElementById('id_cpf');
+    if (cpfField) {
+        cpfField.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 3 && value.length <= 6) {
+                value = value.replace(/(\d{3})(\d{1,3})/, '$1.$2');
+            } else if (value.length > 6 && value.length <= 9) {
+                value = value.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3');
+            } else if (value.length > 9) {
+                value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
+            }
+            e.target.value = value;
+        });
+    }
+
+    // Máscara para Telefone
+    const telefoneField = document.getElementById('id_telefone');
+    if (telefoneField) {
+        telefoneField.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 0 && value.length <= 2) {
+                value = `(${value}`;
+            } else if (value.length > 2 && value.length <= 7) {
+                value = value.replace(/(\d{2})(\d{1,5})/, '($1) $2');
+            } else if (value.length > 7) {
+                value = value.replace(/(\d{2})(\d{5})(\d{1,4})/, '($1) $2-$3');
+            }
+            e.target.value = value;
+        });
+    }
+
+    // Máscara para CEP
+    const cepField = document.getElementById('id_cep');
+    if (cepField) {
+        cepField.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 5) {
+                value = value.replace(/(\d{5})(\d{1,3})/, '$1-$2');
+            }
+            e.target.value = value;
+        });
+    }
+});
+</script>
+{% endblock %}
+
+{% endblock %}

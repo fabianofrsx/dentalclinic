@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page {
+            size: landscape;
+            margin: 1cm;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 15px;
+        }
+        h2 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 12px;
+            table-layout: fixed;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 5px;
+            text-align: left;
+            word-wrap: break-word;
+        }
+        th {
+            background-color: #b8b8b8;
+            color: rgb(0, 0, 0);
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .header-info {
+            font-size: 14px;
+            color: #555;
+        }
+        .footer {
+            text-align: right;
+            font-size: 10px;
+            color: #777;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-info">Relatório gerado em: {% now "d/m/Y H:i" %}</div>
+        <h2>Relatório de Contratos - DENTAL CLINIC</h2>
+        <div class="header-info">Página 1/1</div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th width="12%">Contrato</th>
+                <th width="25%">Paciente</th>
+                <th width="20%">Plano</th>
+                <th width="12%">Adesão</th>
+                <th width="10%">Vencimento</th>
+                <th width="10%">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for contrato in contratos %}
+            <tr>
+                <td>{{ contrato.numero_contrato }}</td>
+                <td>{{ contrato.paciente.nome }}</td>
+                <td>{{ contrato.plano.nome }}</td>
+                <td>{{ contrato.data_adesao|date:"d/m/Y" }}</td>
+                <td>Dia {{ contrato.dia_vencimento }}</td>
+                <td>{{ contrato.get_status_contrato_display }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="footer">
+        DENTAL CLINIC | © {% now "Y" %}
+    </div>
+</body>
+</html>

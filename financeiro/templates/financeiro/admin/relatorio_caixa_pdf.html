@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+        
+    <meta charset="UTF-8">
+    <title>Relatório de Fechamento de Caixa</title>
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 1cm;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10pt;
+        }
+        h1 {
+            font-size: 14pt;
+            text-align: center;
+        }
+        .header {
+            margin-bottom: 1cm;
+        }
+        .totais {
+            margin-bottom: 0.5cm;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.5cm;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            text-align: left;
+            padding: 5px;
+            border: 1px solid #ddd;
+        }
+        td {
+            padding: 5px;
+            border: 1px solid #ddd;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .right {
+            text-align: right;
+        }
+        .center {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+     
+    <div><h2>DENTAL CLINIC</h2></div>
+    
+    <div class="header">
+        <h1>Relatório de Fechamento de Caixa</h1>
+        {% if data_min and data_max %}
+        <p>Período: {{ data_min }} a {{ data_max }}</p>
+        {% endif %}
+      
+    </div>
+
+    <div class="totais">
+        <h3>Resumo:</h3>
+        <ul>
+           <p>Total de Entradas: R$ {{ total_entradas|floatformat:2 }}</p>
+           <p>Total de Saídas: R$ {{ total_saidas|floatformat:2 }}</p>
+           <p>Saldo Final: R$ {{ saldo|floatformat:2 }}</p>
+        </ul>
+    </div>
+
+    <div class="formas-pagamento">
+        <h3>Totais por Forma de Pagamento:</h3>
+        <ul>
+            {% for forma, total in formas_totais.items %}
+            <li>{{ forma }}: R$ {{ total|floatformat:2 }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <h2>Lançamentos:</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>DATA</th>
+                <th>DESCRIÇÃO</th>
+                <th>VALOR</th>
+                <th >TIPO</th>
+                <th>FORMA</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in lancamentos %}
+            <tr>
+                <td>{{ item.data|date:"d/m/Y" }}</td>
+                <td>{{ item.descricao }}</td>
+                <td>R$ {{ item.valor|floatformat:2 }}</td>
+                <td>{{ item.tipo|upper }}</td>
+                <td>{{ item.forma|upper }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

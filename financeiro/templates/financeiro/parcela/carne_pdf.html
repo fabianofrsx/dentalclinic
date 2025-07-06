@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>CARNE</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 9px;
+            margin: 0;
+            padding: 5mm;
+        }
+        .page {
+            width: 210mm;
+            height: 297mm;
+            display: flex;
+            flex-wrap: wrap;
+            align-content: flex-start;
+        }
+        .boleto-container {
+            width: 190mm;
+            height: 70mm;
+            margin: 2mm auto;
+            border: 1px dashed #ccc;
+            box-sizing: border-box;
+            page-break-inside: avoid;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            height: 100%;
+        }
+        td {
+            border: 1px solid #000;
+            vertical-align: top;
+            padding: 1px;
+        }
+        .label {
+            font-weight: bold;
+            font-size: 11px;
+        }
+        .value {
+            font-size: 11px;
+        }
+        .col-left {
+            width: 20%;
+        }
+        .col-middle {
+            width: 60%;
+        }
+        .col-right {
+            width: 20%;
+        }
+        .page-break {
+            page-break-after: always;
+        }
+    </style>
+</head>
+<body>
+
+{% for parcela in parcelas %}
+    {% if forloop.counter0|divisibleby:4 %}
+        <div class="page">
+    {% endif %}
+
+    <div class="boleto-container">
+        <table>
+            <tr>
+                <!-- Coluna Esquerda -->
+                <td class="col-left">
+                    <table>
+                        <tr><td><span class="label">CONTRATO:</span><br><span class="value">{{ contrato.id }}</span></td></tr>
+                        <tr><td><span class="label">PARCELA</span><br><span class="value">{{ parcela.numero }}/{{ parcela.total }}</span></td></tr>
+                        <tr><td><span class="label">VENCIMENTO</span><br><span class="value">{{ parcela.data_vencimento|date:"d/m/Y" }}</span></td></tr>
+                        <tr><td><span class="label">VALOR DO DOCUMENTO</span><br><span class="value">R$ {{ parcela.valor|floatformat:2 }}</span></td></tr>
+                        <tr><td><span class="label">(-) DESCONTOS</span><br><span class="value">&nbsp;</span></td></tr>
+                        <tr><td><span class="label">(+) MULTA/MORA</span><br><span class="value">&nbsp;</span></td></tr>
+                        <tr><td><span class="label">(=) TOTAL</span><br><span class="value">&nbsp;</span></td></tr>
+                    </table>
+                </td>
+
+                <!-- Coluna Central -->
+                <td class="col-middle">
+                    <table>
+                        <tr><td><span class="label">LOCAL DE PAGAMENTO:</span><br><span class="value">Pagável na empresa até o vencimento</span></td></tr>
+                        <tr><td><span class="label">CEDENTE:</span><br>
+                            <span class="value">{{ empresa.nome }}</span><br>
+                            <span class="value">CNPJ: {{ empresa.cnpj }}</span>
+                        </td></tr>
+                        <tr><td><span class="label">INSTRUÇÕES:</span><br>
+                            <span class="value">1. Não receber após o vencimento</span><br>
+                            <span class="value">2. Multa de 2% após vencimento</span>
+                        </td></tr>
+                        <tr><td><span class="label">SACADO:</span><br>
+                            <span class="value">{{ paciente.nome }}</span><br>
+                            <span class="value">CPF: {{ paciente.cpf }}</span><br>
+                            <span class="value">Endereço: {{ paciente.endereco }}</span>
+                        </td></tr>
+                    </table>
+                </td>
+
+                <!-- Coluna Direita -->
+                <td class="col-right">
+                    <table>
+                        <tr><td><span class="label">CONTRATO:</span><br><span class="value">{{ contrato.id }}</span></td></tr>
+                        <tr><td><span class="label">PARCELA</span><br><span class="value">{{ parcela.numero }}/{{ parcela.total }}</span></td></tr>
+                        <tr><td><span class="label">VENCIMENTO</span><br><span class="value">{{ parcela.data_vencimento|date:"d/m/Y" }}</span></td></tr>
+                        <tr><td><span class="label">VALOR DO DOCUMENTO</span><br><span class="value">R$ {{ parcela.valor|floatformat:2 }}</span></td></tr>
+                        <tr><td><span class="label">(-) DESCONTOS</span><br><span class="value">&nbsp;</span></td></tr>
+                        <tr><td><span class="label">(+) MULTA/MORA</span><br><span class="value">&nbsp;</span></td></tr>
+                        <tr><td><span class="label">(=) TOTAL</span><br><span class="value">&nbsp;</span></td></tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    {% if forloop.counter|divisibleby:4 or forloop.last %}
+        </div>
+        {% if not forloop.last %}
+            <div class="page-break"></div>
+        {% endif %}
+    {% endif %}
+{% endfor %}
+
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <style>
+    body { 
+        font-family: Arial, sans-serif; 
+        font-size: 10px; 
+        margin: 20px; 
+    }
+
+    h2 { 
+        text-align: center; 
+        margin-bottom: 10px; 
+    }
+
+    table { 
+        width: 100%; 
+        border-collapse: collapse; 
+        margin-top: 10px; 
+        table-layout: fixed; /* Fundamental para respeitar as larguras */
+    }
+
+    th, td { 
+        border: 1px solid #999; 
+        padding: 3px 2px; 
+        word-wrap: break-word; 
+        vertical-align: middle; 
+    }
+
+    th { 
+        background-color: #eee; 
+        font-size: 10px; 
+    }
+
+    /* Ajuste de largura por coluna */
+    .col-data { width: 12%; }
+    .col-hora { width: 10%; }
+    .col-paciente { width: 38%; }
+    .col-dentista { width: 25%; }
+    .col-status { width: 15%; }
+</style>
+</head>
+<body>
+    <h2>Relatório de Agendamentos</h2>
+    <p><strong>Total de registros:</strong> {{ total }}</p>
+
+    <table>
+    <thead>
+        <tr>
+            <th class="col-data">Data</th>
+            <th class="col-hora">Hora</th>
+            <th class="col-paciente">Paciente</th>
+            <th class="col-dentista">Dentista</th>
+            <th class="col-status">Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for agendamento in agendamentos %}
+        <tr>
+            <td class="col-data">{{ agendamento.data|date:"d/m/Y" }}</td>
+            <td class="col-hora">{{ agendamento.hora|time:"H:i" }}</td>
+            <td class="col-paciente">{{ agendamento.paciente.nome }}</td>
+            <td class="col-dentista">{{ agendamento.dentista.nome }}</td>
+            <td class="col-status">{{ agendamento.get_status_display }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</body>
+</html>

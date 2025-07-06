@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 11pt; }
+        h2 { text-align: center; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #000; padding: 6px; text-align: left; }
+        th { background-color: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <h2>Relatório de Contratos</h2>
+    <p><strong>Total:</strong> {{ contratos|length }} contrato(s)</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ADESÃO</th>
+                <th>PACIENTE</th>
+                <th>PLANO</th>
+                <th>VENCIMENTO</th>
+                <th>STATUS</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in contratos %}
+            <tr>
+                <td>{{ c.data_adesao }}</td>
+                <td>{{ c.paciente.nome }}</td>
+                <td>{{ c.plano.nome }}</td>
+                <td>{{ c.dia_vencimento}}</td>
+                <td>{{ c.get_status_contrato_display }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

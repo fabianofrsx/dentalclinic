@@ -1,0 +1,146 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="container mt-4">
+
+    <div class="card shadow mb-4">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">Filtrar Lançamentos de Caixa</h5>
+        </div>
+        <div class="card-body">
+            <form method="get">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label for="{{ filter.form.data_inicio.id_for_label }}">Data Início:</label>
+                        {{ filter.form.data_inicio }}
+                    </div>
+                    <div class="col-md-3">
+                        <label for="{{ filter.form.data_fim.id_for_label }}">Data Fim:</label>
+                        {{ filter.form.data_fim }}
+                    </div>
+                    <div class="col-md-2">
+                        <label for="{{ filter.form.tipo.id_for_label }}">Tipo:</label>
+                        {{ filter.form.tipo }}
+                    </div>
+                    <div class="col-md-2">
+                        <label for="{{ filter.form.forma.id_for_label }}">Forma:</label>
+                        {{ filter.form.forma }}
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end mt-4">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="fas fa-search me-1"></i> Pesquisar
+                    </button>
+                    <a href="{% url 'financeiro:lista_caixa' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-eraser me-1"></i> Limpar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Botão Exportar PDF -->
+    <div class="d-flex justify-content-end mb-3">
+        <a href="{% url 'financeiro:caixa_pdf' %}?{{ request.GET.urlencode }}" target="_blank" class="btn btn-danger ms-2">
+            <i class="fas fa-file-pdf me-1"></i> Exportar PDF
+        </a>
+    </div>
+
+    <!-- Listagem -->
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Lançamentos</h4>
+        </div>
+        <div class="card-body p-0">
+            {% if lancamentos %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Data</th>
+                                <th>Descrição</th>
+                                <th>Tipo</th>
+                                <th>Forma</th>
+                                <th>Plano Conta</th>
+                                <th>Valor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for lancamento in lancamentos %}
+                            <tr>
+                                <td>{{ lancamento.data|date:"d/m/Y" }}</td>
+                                <td>{{ lancamento.descricao }}</td>
+                                <td>{{ lancamento.get_tipo_display }}</td>
+                                <td>{{ lancamento.get_forma_display }}</td>
+                                <td>{{ lancamento.get_plano_conta_display }}</td>
+                                <td>R$ {{ lancamento.valor|floatformat:2 }}</td>
+                                <td class="text-center">
+                                  <div class="btn-group btn-group-sm" role="group">
+                                      <a href="{% url 'financeiro:editar_caixa' lancamento.id %}" class="btn btn-outline-primary" title="Abrir">
+                                         <i class="fas fa-edit"></i>
+                                        </a>
+                                       <a href="{% url 'financeiro:excluir_caixa' lancamento.id %}" class="btn btn-outline-danger" title="Excluir">
+                                         <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Paginação -->
+                <div class="p-3">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            {% if lancamentos.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1{% if request.GET.data_inicio %}&data_inicio={{ request.GET.data_inicio }}{% endif %}{% if request.GET.data_fim %}&data_fim={{ request.GET.data_fim }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.forma %}&forma={{ request.GET.forma }}{% endif %}" aria-label="First">
+                                        <span aria-hidden="true">&laquo;&laquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ lancamentos.previous_page_number }}{% if request.GET.data_inicio %}&data_inicio={{ request.GET.data_inicio }}{% endif %}{% if request.GET.data_fim %}&data_fim={{ request.GET.data_fim }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.forma %}&forma={{ request.GET.forma }}{% endif %}" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                            
+                            {% for num in lancamentos.paginator.page_range %}
+                                {% if lancamentos.number == num %}
+                                    <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                                {% elif num > lancamentos.number|add:'-3' and num < lancamentos.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}{% if request.GET.data_inicio %}&data_inicio={{ request.GET.data_inicio }}{% endif %}{% if request.GET.data_fim %}&data_fim={{ request.GET.data_fim }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.forma %}&forma={{ request.GET.forma }}{% endif %}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if lancamentos.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ lancamentos.next_page_number }}{% if request.GET.data_inicio %}&data_inicio={{ request.GET.data_inicio }}{% endif %}{% if request.GET.data_fim %}&data_fim={{ request.GET.data_fim }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.forma %}&forma={{ request.GET.forma }}{% endif %}" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ lancamentos.paginator.num_pages }}{% if request.GET.data_inicio %}&data_inicio={{ request.GET.data_inicio }}{% endif %}{% if request.GET.data_fim %}&data_fim={{ request.GET.data_fim }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.forma %}&forma={{ request.GET.forma }}{% endif %}" aria-label="Last">
+                                        <span aria-hidden="true">&raquo;&raquo;</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    <div class="text-center text-muted">
+                        Página {{ lancamentos.number }} de {{ lancamentos.paginator.num_pages }} - Total de {{ lancamentos.paginator.count }} registros
+                    </div>
+                </div>
+            {% else %}
+                <div class="p-3 text-center text-muted">
+                    Nenhum lançamento encontrado.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}
