@@ -75,7 +75,6 @@
             Agendamentos
           </a>
           <ul class="dropdown-menu" aria-labelledby="agendamentoDropdown">
-            <li><a class="dropdown-item" href="{% url 'agendamento:agendar' %}">Agendar</a></li>
             <li><a class="dropdown-item" href="{% url 'agendamento:lista_agendamentos' %}">Listar</a></li>
           </ul>
         </li>
@@ -94,7 +93,6 @@
           <ul class="dropdown-menu" aria-labelledby="financeiroDropdown">
             <li><a class="dropdown-item" href="{% url 'financeiro:caixa_cadastrar' %}">Caixa</a></li>
             <li><a class="dropdown-item" href="{% url 'financeiro:lista_caixa' %}">Movimento do caixa</a></li>
-            <li><a class="dropdown-item" href="{% url 'financeiro:contrato_cadastrar' %}">Contratos</a></li>
             <li><a class="dropdown-item" href="{% url 'financeiro:contrato_listar' %}">Listar contratos</a></li>
             <li><a class="dropdown-item" href="{% url 'financeiro:plano_cadastrar' %}">Planos</a></li>
           </ul>
@@ -134,17 +132,17 @@
          
       </ul>
       <form class="d-flex" role="search" action="{% url 'financeiro:buscar_paciente' %}" method="GET">
-    <input
-      id="autocomplete-busca"
-      class="form-control me-2"
-      type="search"
-      placeholder="Pesquisar por nome ou CPF"
-      aria-label="Pesquisar"
-      name="q"
-      autocomplete="on"
-    />
-    <button class="btn btn-outline-light" type="submit">Buscar</button>
-</form>
+       <input
+         id="autocomplete-busca"
+         class="form-control me-2"
+         type="search"
+         placeholder="Pesquisar por nome ou CPF"
+         aria-label="Pesquisar"
+         name="q"
+         autocomplete="on"
+        />
+        <button class="btn btn-outline-light" type="submit">Buscar</button>
+      </form>
 {% if user.is_authenticated %}
   <div class="d-flex align-items-center ms-3">
     <span class="text-white me-2">
