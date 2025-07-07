@@ -14,5 +14,6 @@ urlpatterns = [
     path('excluir/<int:pk>/', views.excluir_agenda, name='excluir_agenda'),
     path('autocomplete-paciente/', views.autocomplete_paciente, name='autocomplete_paciente'),
     path('cadastro-dentista/', views.cadastro_dentista, name='cadastro_dentista'),
+    path('paciente/<int:paciente_id>/', views.agendar_paciente, name='agendar_paciente'),
            
 ]

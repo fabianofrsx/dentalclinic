@@ -151,3 +151,20 @@ def cadastro_dentista(request):
 
     return render(request, 'cadastro_dentista_modal.html', {'form_dentista': form})
 
+def agendar_paciente(request, paciente_id):
+    paciente = get_object_or_404(Paciente, id=paciente_id)
+
+    if request.method == 'POST':
+        form = AgendamentoForm(request.POST)
+        if form.is_valid():
+            agendamento = form.save(commit=False)
+            agendamento.paciente = paciente  # garante que está vinculado ao paciente
+            agendamento.save()
+            return redirect('paciente:listar_pacientes')
+    else:
+        form = AgendamentoForm(initial={'paciente': paciente})
+
+    return render(request, 'agendamento/agendar.html', {
+        'form': form,
+        'paciente': paciente
+    })

@@ -76,6 +76,9 @@ class AgendamentoForm(forms.ModelForm):
         self.fields['paciente'].empty_label = 'Selecione um paciente'
         self.fields['dentista'].empty_label = 'Selecione um dentista'
         self.fields['status'].empty_label = 'Selecione o status'
+
+        if 'paciente' in self.fields:
+            self.fields['paciente'].disabled = True
         
 class DentistaForm(forms.ModelForm):
     class Meta:
