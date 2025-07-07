@@ -62,7 +62,7 @@
                                 <td>{{ paciente.data_nascimento|date:"d/m/Y" }}</td>
                                 <td class="text-center">
                                   <div class="btn-group btn-group-sm" role="group">
-                                      <a href="{% url 'paciente:editar_paciente' paciente.id %}" class="btn btn-outline-primary" title="Abrir">
+                                       <a href="{% url 'paciente:editar_paciente' paciente.id %}" class="btn btn-outline-primary" title="Abrir">
                                          <i class="fas fa-edit"></i>
                                         </a>
                                        <a href="{% url 'paciente:excluir_paciente' paciente.id %}" class="btn btn-outline-danger" title="Excluir">
@@ -70,6 +70,12 @@
                                         </a>
                                         <a href="{% url 'financeiro:paciente_ficha' paciente.id %}" class="btn btn-outline-info" title="Cadastro">
                                          <i class="fas fa-id-card"></i>
+                                        </a>
+                                        <a href="{% url 'agendamento:agendar_paciente' paciente.id %}" class="btn btn-outline-secondary" title="Agendar">
+                                         <i class="fas fa-calendar"></i>
+                                        </a>
+                                        <a href="{% url 'financeiro:contrato_paciente' paciente.id %}" class="btn btn-outline-primary btn-sm" title="Novo contrato">
+                                         <i class="fas fa-file-signature"></i>
                                         </a>
                                     </div>
                                 </td>
