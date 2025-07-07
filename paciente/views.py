@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from .forms import PacienteForm
 from financeiro.forms import ParcelaReceberForm
+from agendamento.forms import AgendamentoForm
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Paciente
 from django.db.models import Q
@@ -100,4 +101,6 @@ def paciente_editar(request, paciente_id):
         'parcelas_pagas': parcelas_pagas,
     }
     return render(request, 'paciente/paciente_editar.html', context)
+
+
 
