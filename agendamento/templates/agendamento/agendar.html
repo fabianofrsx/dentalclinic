@@ -11,26 +11,26 @@
             </a>
         </div>
         
-        <div class="card-body">
+    <div class="card-body">
             <form method="post" class="needs-validation" novalidate>
                 {% csrf_token %}
 
                 
-                <div class="row mb-4">
+    <div class="row mb-4">
     <!-- Coluna 1: Paciente -->
-    <div class="col-md-6 mb-3">
+    <div class="col-md-6">
         <label for="id_paciente" class="form-label">Paciente*</label>
         {{ form.paciente }}
     </div>
 
     <!-- Coluna 2: Dentista -->
-    <div class="col-md-6 mb-3">
-        <label for="id_dentista" class="form-label d-flex justify-content-between align-items-center">
-            Dentista*
+    <div class="col-md-6">
+        <div class="d-flex justify-content-between align-items-center">
+            <label for="id_dentista" class="form-label mb-0">Dentista*</label>
             <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalDentista">
                 <i class="fas fa-user-plus"></i> Novo Dentista
             </button>
-        </label>
+        </div>
         {{ form.dentista }}
     </div>
 </div>
