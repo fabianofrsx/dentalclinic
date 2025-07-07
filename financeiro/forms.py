@@ -14,6 +14,11 @@ class ContratoForm(forms.ModelForm):
             'status_contrato': forms.Select(attrs={'class': 'form-control'}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'paciente' in self.fields:
+            self.fields['paciente'].disabled = True
+
 class CaixaForm(forms.ModelForm):
     class Meta:
         model = Caixa

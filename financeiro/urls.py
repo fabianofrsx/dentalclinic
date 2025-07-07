@@ -15,6 +15,7 @@ urlpatterns = [
     path('parcela/receber/<int:parcela_id>/', views.parcela_receber, name='parcela_receber'),
     path('plano/cadastrar/', views.plano_cadastrar, name='plano_cadastrar'),
     path('paciente/<int:paciente_id>/', views.paciente_ficha, name='paciente_ficha'),
+    path('contrato/paciente/<int:paciente_id>/', views.contrato_paciente, name='contrato_paciente'),
     path('buscar/', views.buscar_paciente, name='buscar_paciente'),
     path('autocomplete-paciente/', views.autocomplete_paciente, name='autocomplete_paciente'),
     path('contrato/exportar-pdf/', views.contrato_exportar_pdf, name='contrato_exportar_pdf'),
@@ -23,4 +24,6 @@ urlpatterns = [
     path('contrato/<int:contrato_id>/carne/', views.gerar_carne_pdf, name='gerar_carne_pdf'),
     path('plano/editar/<int:pk>/', views.plano_editar, name='plano_editar'),
     path('parcela/relatorio-parcelas/', views.relatorio_parcelas, name='relatorio_parcelas'),
+    path('parcela/estornar/<int:parcela_id>/', views.estornar_parcela, name='estornar_parcela'),
+    path('parcela/excluir/<int:parcela_id>/', views.excluir_parcela, name='excluir_parcela'),
 ]

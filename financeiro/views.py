@@ -28,6 +28,7 @@ from reportlab.pdfgen import canvas
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, PageBreak, Paragraph
 from datetime import datetime
 from django.utils.timezone import localdate
+from django.contrib import messages
 
 
 def dashboard(request):
@@ -260,21 +261,18 @@ def buscar_paciente(request):
 
 
 def autocomplete_paciente(request):
-    if 'term' in request.GET:
-        termo = request.GET.get('term')
-        qs = Paciente.objects.filter(
-            Q(nome__icontains=termo) | Q(cpf__icontains=termo)
-        )[:10]  # limitar resultados para não sobrecarregar
-        
-        resultados = []
-        for paciente in qs:
-            resultados.append({
-                'label': f"{paciente.nome} - {paciente.cpf}",
-                'value': paciente.nome,
-                'id': paciente.id,
-            })
-        return JsonResponse(resultados, safe=False)
-    return JsonResponse([], safe=False)
+    term = request.GET.get('term', '')
+    pacientes = Paciente.objects.filter(
+        Q(nome__icontains=term) | Q(cpf__icontains=term)
+    ).values('id', 'nome', 'cpf')[:10]
+    
+    results = [{
+        'id': p['id'],
+        'label': f"{p['nome']} - {p['cpf']}",
+        'value': p['nome']
+    } for p in pacientes]
+    
+    return JsonResponse(results, safe=False)
 
 def buscar_pacientes(request):
     query = request.GET.get('q', '')
@@ -492,3 +490,49 @@ def relatorio_parcelas(request):
         'data_inicio': data_inicio,
         'data_fim': data_fim,
     })
+
+def contrato_paciente(request, paciente_id):
+    paciente = get_object_or_404(Paciente, id=paciente_id)
+
+    if request.method == 'POST':
+        form = ContratoForm(request.POST)
+        if form.is_valid():
+            contrato = form.save(commit=False)
+            contrato.paciente = paciente  # garante que está vinculado ao paciente
+            contrato.save()
+            return redirect('paciente:listar_pacientes')
+    else:
+        form = ContratoForm(initial={'paciente': paciente})
+
+    return render(request, 'financeiro/contrato/contrato_cadastrar.html', {
+        'form': form,
+        'paciente': paciente
+    })
+
+def estornar_parcela(request, parcela_id):
+    parcela = get_object_or_404(Parcela, id=parcela_id)
+    
+    if parcela.status == 'pago':
+        parcela.status = 'aberto'
+        parcela.valor_pago = None
+        parcela.data_pagamento = None
+        parcela.forma_pagamento = None
+        parcela.save()
+        messages.success(request, "Pagamento estornado com sucesso. Lembre-se de ajustar o caixa manualmente.")
+    else:
+        messages.warning(request, "Esta parcela não está paga.")
+
+    return redirect('financeiro:paciente_ficha', parcela.contrato.paciente.id)
+
+def excluir_parcela(request, parcela_id):
+    parcela = get_object_or_404(Parcela, id=parcela_id)
+    paciente_id = parcela.contrato.paciente.id
+
+    # Só permitir exclusão via POST para segurança
+    if request.method == 'POST':
+        parcela.delete()
+        messages.success(request, "Parcela excluída com sucesso.")
+        return redirect('financeiro:paciente_ficha', paciente_id=paciente_id)
+    else:
+        messages.error(request, "Operação inválida.")
+        return redirect('financeiro:paciente_ficha', paciente_id=paciente_id)
