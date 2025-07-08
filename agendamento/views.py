@@ -14,6 +14,7 @@ from django.views.decorators.http import require_GET
 from datetime import datetime
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
+from django.views.decorators.csrf import csrf_exempt
 
 def dashboard(request):
     hoje = date.today()
@@ -202,3 +203,26 @@ def agendar_paciente(request, paciente_id):
         'form': form,
         'paciente': paciente
     })
+
+@csrf_exempt  # Apenas se o CSRF não estiver sendo enviado corretamente
+def atualizar_status_agendamento(request, agendamento_id):
+    if request.method == 'POST':
+        status = request.POST.get('status')
+
+        try:
+            agendamento = Agendamento.objects.get(id=agendamento_id)
+            agendamento.status = status
+            agendamento.save()
+
+            # mapeia o nome exibido (como no get_status_display)
+            status_display = dict(Agendamento.STATUS_CHOICES).get(status, status)
+
+            return JsonResponse({
+                'success': True,
+                'new_status': status,
+                'new_status_display': status_display,
+            })
+        except Agendamento.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Agendamento não encontrado.'})
+
+    return JsonResponse({'success': False, 'error': 'Método inválido.'})

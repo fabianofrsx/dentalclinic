@@ -349,26 +349,42 @@
                                 </div>
                             </div>
                             <div class="appointment-actions">
-                                {% if agendamento.status == 'agendado' %}
-                                    <button class="btn-action btn-check" title="Marcar como Atendido" data-agendamento-id="{{ agendamento.id }}">
-                                        <i class="fas fa-check"></i>
-                                    </button>
-                                    <a href="{% url 'agendamento:editar_agenda' pk=agendamento.id %}" class="btn-action btn-edit" title="Editar">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <button class="btn-action btn-cancel" title="Cancelar" data-agendamento-id="{{ agendamento.id }}">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                {% elif agendamento.status == 'atendido' %}
-                                    <a href="{% url 'agendamento:editar_agenda' pk=agendamento.id %}" class="btn-action btn-edit" title="Editar">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                {% elif agendamento.status == 'cancelado' or agendamento.status == 'faltou' %}
-                                    <a href="{% url 'agendamento:editar_agenda' pk=agendamento.id %}" class="btn-action btn-edit" title="Reagendar">
-                                        <i class="fas fa-redo"></i>
-                                    </a>
-                                {% endif %}
-                            </div>
+    {% if agendamento.status == 'agendado' %}
+        <button class="btn-action btn-check" title="Marcar como Atendido" data-agendamento-id="{{ agendamento.id }}">
+            <i class="fas fa-check"></i>
+        </button>
+        <a href="{% url 'agendamento:editar_agenda' pk=agendamento.id %}" class="btn-action btn-edit" title="Editar">
+            <i class="fas fa-edit"></i>
+        </a>
+        <a href="{% url 'agendamento:excluir_agenda' pk=agendamento.id %}" 
+         class="btn-action"
+         style="background-color: #dc3545; color: white; width: 36px; height: 36px; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 0.875rem;" 
+         title="Excluir agendamento"> 
+         <i class="fas fa-times"></i>
+        </a>
+    {% elif agendamento.status == 'atendido' %}
+        <a href="{% url 'agendamento:editar_agenda' pk=agendamento.id %}" class="btn-action btn-edit" title="Editar">
+            <i class="fas fa-edit"></i>
+        </a>
+       <a href="{% url 'agendamento:excluir_agenda' pk=agendamento.id %}" 
+         class="btn-action"
+         style="background-color: #dc3545; color: white; width: 36px; height: 36px; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 0.875rem;" 
+         title="Excluir agendamento"> 
+         <i class="fas fa-times"></i>
+        </a>
+    {% elif agendamento.status == 'cancelado' or agendamento.status == 'faltou' %}
+        <a href="{% url 'agendamento:editar_agenda' pk=agendamento.id %}" class="btn-action btn-edit" title="Reagendar">
+            <i class="fas fa-redo"></i>
+        </a>
+        <a href="{% url 'agendamento:excluir_agenda' pk=agendamento.id %}" 
+         class="btn-action"
+         style="background-color: #dc3545; color: white; width: 36px; height: 36px; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 0.875rem;" 
+         title="Excluir agendamento"> 
+         <i class="fas fa-times"></i>
+        </a>
+    {% endif %}
+</div>
+
                         </div>
                     {% endfor %}
                 {% else %}
