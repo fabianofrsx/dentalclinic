@@ -342,8 +342,14 @@
                                     {% if agendamento.dentista %}
                                         <span><i class="fas fa-user-md"></i> {{ agendamento.dentista.nome }}</span>
                                     {% endif %}
-                                    {% if agendamento.procedimento %}
-                                        <span><i class="fas fa-procedures"></i> {{ agendamento.procedimento }}</span>
+                                    {% if agendamento.confirmacao == 'sim' %}
+                                    <span class="text-success">
+                                     <i class="fas fa-check-circle"></i> {{ agendamento.get_confirmacao_display }}
+                                    </span>
+                                    {% else %}
+                                    <span class="text-secondary">
+                                     <i class="fas fa-clock"></i> {{ agendamento.get_confirmacao_display }}
+                                    </span>
                                     {% endif %}
                                     <span class="status-badge status-{{ agendamento.status|lower }}">{{ agendamento.get_status_display|default:agendamento.status|capfirst }}</span>
                                 </div>
