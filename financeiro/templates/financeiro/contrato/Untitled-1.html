@@ -1,0 +1,132 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Talão de Boleto Recorrente</title>
+    <style>
+       
+	    body {
+            font-family: Arial, sans-serif;
+            font-size: 10px;
+            margin: 0;
+            padding: 0;
+        }
+        .talhao {
+            display: flex;
+            width: 756px; /* Largura total */
+        }
+        .canhoto {
+            width: 50mm; /* Largura do canhoto */
+            border: 1px solid #000;
+            border-right: none;
+            padding: 5px;
+            position: relative;
+        }
+        .linha-corte {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            border-right: 1px dashed #000;
+        }
+        .boleto {
+            width: 476px; /* Largura padrão do boleto */
+            border: 1px solid #000;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        td {
+            border: 1px solid #000;
+            padding: 2px;
+            vertical-align: top;
+        }
+       
+        .linha-pontilhada {
+            border-top: 1px dashed #000;
+            height: 10px;
+        }
+        .destaque {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Talão completo -->
+<div class="talhao">
+    <!-- Canhoto (à esquerda) -->
+    <div class="canhoto">
+        <div class="linha-corte"></div> <!-- Linha pontilhada vertical -->
+        
+        <div class="destaque" style="text-align: center;">RECIBO DO SACADO</div>
+        <div style="text-align: center; margin-bottom: 10px;">(Corte na linha pontilhada)</div>
+        
+        <div><span class="destaque">Beneficiário:</span><br>
+        Nome da Empresa Ltda<br>
+        CNPJ: 00.000.000/0000-00<br>
+        Endereço: Rua Exemplo, 123 - São Paulo/SP</div>
+        
+        <div style="margin-top: 10px;">
+            <div><span class="destaque">Vencimento:</span> 10/07/2024</div>
+            <div><span class="destaque">Valor:</span> R$ 1.000,00</div>
+            <div><span class="destaque">Nosso Número:</span> 000000000000</div>
+            <div><span class="destaque">Cliente:</span> João da Silva</div>
+        </div>
+        
+        <div style="margin-top: 15px; text-align: center;">
+            ___________________________<br>
+            Assinatura do Sacado
+        </div>
+    </div>
+
+    <!-- Boleto completo (à direita) -->
+    <div class="boleto">
+    <table>
+        <!-- Dados do Boleto (2 colunas - INVERTIDAS) -->
+        <tr>
+            <!-- Coluna 1 (Dados variáveis) - AGORA À ESQUERDA -->
+            <td width="340">
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td height="25"><strong>Vencimento:</strong> 10/07/2024</td>
+                    </tr>
+                    <tr>
+                        <td height="25"><strong>Agência/Código:</strong> 1234-5 / 67890-1</td>
+                    </tr>
+                    <tr>
+                        <td height="25"><strong>Nosso Número:</strong> 000000000000</td>
+                    </tr>
+                    <tr>
+                        <td height="25"><strong>Valor do Documento:</strong> R$ 1.000,00</td>
+                    </tr>
+                    <tr>
+                        <td height="25"><strong>(-) Descontos:</strong> R$ 0,00</td>
+                    </tr>
+                    <tr>
+                        <td class="linha-pontilhada"></td>
+                    </tr>
+                </table>
+            </td>
+            
+            <!-- Coluna 2 (Beneficiário) - AGORA À DIREITA -->
+            <td width="120" height="168">
+                <strong>Beneficiário:</strong><br>
+                Nome da Empresa Ltda<br>
+                CNPJ: 00.000.000/0000-00<br>
+                Endereço: Rua Exemplo, 123
+            </td>
+        </tr>
+        
+        <!-- Rodapé (Instruções) -->
+        <tr>
+            <td colspan="2" height="50">
+                <strong>Instruções:</strong> Pagável em qualquer banco até o vencimento.
+            </td>
+        </tr>
+    </table>
+</div>
+
+</body>
+</html>

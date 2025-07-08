@@ -1,215 +1,641 @@
 {% extends 'core/base.html' %}
+
 {% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
 
-{% block content %}
-<div class="container-fluid">
-  <div class="row">
-    
-    <!-- Coluna Esquerda -->
-    <div class="col-md-4">
-      
-      <!-- Card Status de Contratos -->
-      <div class="card widget-box mb-4">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-          <span>Status de Contratos</span>
-          <span class="badge bg-light text-dark">{{ total_contratos }} total</span>
-        </div>
-        <div class="card-body">
-          <div class="status-list">
-            <div class="status-item d-flex justify-content-between mb-2">
-              <span class="badge bg-primary">Ativos</span>
-              <span class="fw-bold">{{ contratos_ativos }}</span>
-            </div>
-            <div class="status-item d-flex justify-content-between mb-2">
-              <span class="badge bg-warning text-dark">Pendentes</span>
-              <span class="fw-bold">{{ contratos_pendentes }}</span>
-            </div>
-            <div class="status-item d-flex justify-content-between">
-              <span class="badge bg-danger">Cancelados</span>
-              <span class="fw-bold">{{ contratos_cancelados }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- Fim Card Status de Contratos -->
-
-      <!-- Card Caixa do dia -->
-      <div class="card widget-box mb-4">
-       <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-        <h6 class="mb-0">Fechamento diário - {{ data_atual|date:"d/m/Y" }}</h6>
-       </div>
-       <div class="card-body">
-         <p><strong>Entradas:</strong> R$ {{ total_entradas|floatformat:2 }}</p>
-         <p><strong>Saídas:</strong> R$ {{ total_saidas|floatformat:2 }}</p>
-         <p><strong>Saldo:</strong>
-            <span class="{% if saldo >= 0 %}text-success{% else %}text-danger{% endif %}">
-                R$ {{ saldo|floatformat:2 }}
-            </span>
-          </p>
-          <hr>
-          <div class="status-item d-flex justify-content-between">
-           <h6 class="fw-bold mb-0 text-primary">
-             <i class="fas fa-money-check-alt me-2"></i>Saldo por forma de pagamento
-           </h6>
-          </div>
-          <hr>
-          {% for forma, valor in saldo_por_forma.items %}
-          <p>
-            <strong>{{ forma|capfirst }}:</strong>
-             <span class="{% if valor >= 0 %}text-success{% else %}text-danger{% endif %}">
-              R$ {{ valor|floatformat:2 }}
-            </span>
-          </p>
-          {% empty %}
-          <p>Não há movimentações por forma de pagamento.</p>
-          {% endfor %}
-          <hr>
-        </div>
-      </div>
-      <!-- Fim Card Caixa do dia -->
-      
-    </div>
-    <!-- Fim Coluna Esquerda -->
-
-    <!-- Coluna Direita -->
-    <div class="col-md-8">
-      
-      <!-- Card Agendamentos do Dia -->
-      <div class="card widget-box">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-          <span>Agendamentos do Dia - {{ data_atual|date:"d/m/Y" }}</span>
-          <div>
-            <span class="badge bg-primary me-2">Agendados: {{ total_agendados }}</span>
-            <span class="badge bg-secondary">{{ agendamentos.paginator.count }} no total</span>
-          </div>
-        </div>
-        
-        <div class="card-body p-0">
-          <div class="table-responsive">
-            <table class="table table-hover table-agendamentos mb-0">
-              <thead class="table-light">
-                <tr>
-                  <th>Hora</th>
-                  <th>Paciente</th>
-                  <th>Dentista</th>
-                  <th>Status</th>
-                  <th>Confirmação</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for agendamento in agendamentos %}
-                 <tr> 
-                    
-                   <td>{{ agendamento.hora|time:"H:i" }}</td>
-                   <td>{{ agendamento.paciente.nome }}</td>
-                   <td>{{ agendamento.dentista.nome }}</td>
-                   <td>
-                    {% if agendamento.status == 'agendado' %}
-                    <span class="badge bg-primary">Agendado</span>
-                    {% elif agendamento.status == 'cancelado' %}
-                    <span class="badge bg-danger">Cancelado</span>
-                    {% elif agendamento.status == 'atendido' %}
-                    <span class="badge bg-success">Atendido</span>
-                    {% elif agendamento.status == 'nao_atendido' %}
-                    <span class="badge bg-warning text-dark">Não Atendido</span>
-                    {% else %}
-                    <span class="badge bg-secondary">{{ agendamento.status }}</span>
-                    {% endif %}
-                  </td>
-                  <td>{{ agendamento.get_confirmacao_display }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                  <td colspan="4" class="text-center py-3">Nenhum agendamento para hoje.</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-          <!-- Fim Tabela -->
-
-          <!-- Paginação -->
-          {% if agendamentos.paginator.num_pages > 1 %}
-          <div class="p-3 border-top">
-            <nav aria-label="Page navigation">
-              <ul class="pagination justify-content-center mb-2">
-                {% if agendamentos.has_previous %}
-                  <li class="page-item">
-                    <a class="page-link" href="?page_agendamentos=1" aria-label="First">
-                      &laquo;&laquo;
-                    </a>
-                  </li>
-                  <li class="page-item">
-                    <a class="page-link" href="?page_agendamentos={{ agendamentos.previous_page_number }}" aria-label="Previous">
-                      &laquo;
-                    </a>
-                  </li>
-                {% endif %}
-                
-                {% for num in agendamentos.paginator.page_range %}
-                  {% if agendamentos.number == num %}
-                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-                  {% elif num > agendamentos.number|add:'-3' and num < agendamentos.number|add:'3' %}
-                    <li class="page-item">
-                      <a class="page-link" href="?page_agendamentos={{ num }}">{{ num }}</a>
-                    </li>
-                  {% endif %}
-                {% endfor %}
-                
-                {% if agendamentos.has_next %}
-                  <li class="page-item">
-                    <a class="page-link" href="?page_agendamentos={{ agendamentos.next_page_number }}" aria-label="Next">
-                      &raquo;
-                    </a>
-                  </li>
-                  <li class="page-item">
-                    <a class="page-link" href="?page_agendamentos={{ agendamentos.paginator.num_pages }}" aria-label="Last">
-                      &raquo;&raquo;
-                    </a>
-                  </li>
-                {% endif %}
-              </ul>
-            </nav>
-            <div class="text-center text-muted small">
-              Página {{ agendamentos.number }} de {{ agendamentos.paginator.num_pages }} 
-              | Mostrando {{ agendamentos.start_index }}-{{ agendamentos.end_index }} de {{ agendamentos.paginator.count }}
-            </div>
-          </div>
-          {% endif %}
-          <!-- Fim Paginação -->
-          
-        </div>
-      </div>
-      <!-- Fim Card Agendamentos -->
-      
-    </div>
-    <!-- Fim Coluna Direita -->
-    
-  </div>
-</div>
-
+{% block extra_css %}
 <style>
-.widget-box {
-  margin-bottom: 20px;
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-  border: none;
-}
-.table-agendamentos {
-  font-size: 0.9rem;
-}
-.table-agendamentos tbody tr:hover {
-  background-color: #f8f9fa;
-}
-.status-list {
-  font-size: 0.95rem;
-}
-.status-item {
-  padding: 0.3rem 0.5rem;
-  border-radius: 4px;
-  background-color: #f8f9fa;
-}
-.card-header {
-  font-weight: 500;
-}
+    .dashboard-content {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+        max-width: 1400px;
+    }
+
+    .appointments-main {
+        grid-column: 1;
+    }
+
+    .sidebar-widgets {
+        grid-column: 2;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .appointment-item {
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid var(--gray-100);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+
+    .appointment-item:hover {
+        background: var(--gray-50);
+    }
+
+    .appointment-item:last-child {
+        border-bottom: none;
+    }
+
+    .appointment-time {
+        background: var(--primary-color);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        min-width: 80px;
+        text-align: center;
+    }
+
+    .appointment-info {
+        flex: 1;
+    }
+
+    .patient-name {
+        font-weight: 600;
+        color: var(--gray-900);
+        font-size: 1rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .appointment-details {
+        color: var(--gray-600);
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+
+    .status-agendado {
+        background: #dbeafe;
+        color: var(--primary-color);
+    }
+
+    .status-atendido {
+        background: #d1fae5;
+        color: var(--success-color);
+    }
+
+    .status-cancelado {
+        background: #fee2e2;
+        color: var(--danger-color);
+    }
+
+    .status-faltou {
+        background: #fef3c7;
+        color: var(--warning-color);
+    }
+
+    .status-remarcado {
+        background: #e0e7ff;
+        color: #6366f1;
+    }
+
+    .status-reagendado {
+        background: #fef3c7;
+        color: var(--warning-color);
+    }
+
+    .appointment-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn-action {
+        width: 36px;
+        height: 36px;
+        border-radius: 0.5rem;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 0.875rem;
+    }
+
+    .btn-check {
+        background: var(--success-color);
+        color: white;
+    }
+
+    .btn-check:hover {
+        background: #059669;
+        transform: scale(1.05);
+    }
+
+    .btn-cancel {
+        background: var(--danger-color);
+        color: white;
+    }
+
+    .btn-cancel:hover {
+        background: #dc2626;
+        transform: scale(1.05);
+    }
+
+    .btn-edit {
+        background: var(--warning-color);
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background: #d97706;
+        transform: scale(1.05);
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        padding: 1.5rem;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 1rem;
+        border-radius: 0.75rem;
+        background: var(--gray-50);
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        color: var(--gray-600);
+        font-weight: 500;
+    }
+
+    .stat-agendados .stat-number { color: var(--primary-color); }
+    .stat-atendidos .stat-number { color: var(--success-color); }
+    .stat-cancelados .stat-number { color: var(--danger-color); }
+    .stat-faltaram .stat-number { color: var(--warning-color); }
+
+    .financial-summary {
+        padding: 1.5rem;
+    }
+
+    .financial-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--gray-100);
+    }
+
+    .financial-item:last-child {
+        border-bottom: none;
+        font-weight: 600;
+        font-size: 1.125rem;
+        padding-top: 1rem;
+        border-top: 2px solid var(--gray-200);
+    }
+
+    .financial-label {
+        color: var(--gray-600);
+        font-weight: 500;
+    }
+
+    .financial-value {
+        font-weight: 600;
+    }
+
+    .financial-positive {
+        color: var(--success-color);
+    }
+
+    .financial-negative {
+        color: var(--danger-color);
+    }
+
+    .quick-actions {
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .btn-quick {
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        justify-content: center;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+        color: white;
+    }
+
+    .btn-outline {
+        background: transparent;
+        color: var(--primary-color);
+        border: 2px solid var(--primary-color);
+    }
+
+    .btn-outline:hover {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: var(--gray-500);
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    .notification-badge {
+        background: var(--danger-color);
+        color: white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        font-size: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: auto;
+    }
+
+    .progress-bar {
+        width: 100%;
+        height: 8px;
+        background: var(--gray-200);
+        border-radius: 4px;
+        overflow: hidden;
+        margin-top: 0.5rem;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+        transition: width 0.3s ease;
+    }
+
+    @media (max-width: 1024px) {
+        .dashboard-content {
+            grid-template-columns: 1fr;
+            padding: 1rem;
+        }
+    }
 </style>
 {% endblock %}
+
+{% block content %}
+<!-- Dashboard Content -->
+<div class="dashboard-content">
+    <!-- Main Appointments Section -->
+    <div class="appointments-main">
+        <div class="card">
+            <div class="card-header">
+                <h3>
+                    <i class="fas fa-calendar-day"></i>
+                    Agendamentos de Hoje
+                </h3>
+                <span class="notification-badge">{{ agendamentos.paginator.count }}</span>
+            </div>
+            <div class="card-body">
+                {% if agendamentos %}
+                    {% for agendamento in agendamentos %}
+                        <div class="appointment-item">
+                            <div class="appointment-time">{{ agendamento.hora|time:"H:i" }}</div>
+                            <div class="appointment-info">
+                                <div class="patient-name">{{ agendamento.paciente.nome }}</div>
+                                <div class="appointment-details">
+                                    {% if agendamento.dentista %}
+                                        <span><i class="fas fa-user-md"></i> {{ agendamento.dentista.nome }}</span>
+                                    {% endif %}
+                                    {% if agendamento.procedimento %}
+                                        <span><i class="fas fa-procedures"></i> {{ agendamento.procedimento }}</span>
+                                    {% endif %}
+                                    <span class="status-badge status-{{ agendamento.status|lower }}">{{ agendamento.get_status_display|default:agendamento.status|capfirst }}</span>
+                                </div>
+                            </div>
+                            <div class="appointment-actions">
+                                {% if agendamento.status == 'agendado' %}
+                                    <button class="btn-action btn-check" title="Marcar como Atendido" data-agendamento-id="{{ agendamento.id }}">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <a href="{% url 'agendamento:editar_agenda' pk=agendamento.id %}" class="btn-action btn-edit" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button class="btn-action btn-cancel" title="Cancelar" data-agendamento-id="{{ agendamento.id }}">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                {% elif agendamento.status == 'atendido' %}
+                                    <a href="{% url 'agendamento:editar_agenda' pk=agendamento.id %}" class="btn-action btn-edit" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                {% elif agendamento.status == 'cancelado' or agendamento.status == 'faltou' %}
+                                    <a href="{% url 'agendamento:editar_agenda' pk=agendamento.id %}" class="btn-action btn-edit" title="Reagendar">
+                                        <i class="fas fa-redo"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-check"></i>
+                        <p>Nenhum agendamento para hoje.</p>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Paginação -->
+            {% if agendamentos.has_other_pages %}
+                <div class="card-footer d-flex justify-content-center">
+                    <nav aria-label="Paginação de agendamentos">
+                        <ul class="pagination">
+                            {% if agendamentos.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page_agendamentos={{ agendamentos.previous_page_number }}">Anterior</a>
+                                </li>
+                            {% endif %}
+
+                            {% for i in agendamentos.paginator.page_range %}
+                                {% if agendamentos.number == i %}
+                                    <li class="page-item active">
+                                        <a class="page-link" href="#">{{ i }}</a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page_agendamentos={{ i }}">{{ i }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if agendamentos.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page_agendamentos={{ agendamentos.next_page_number }}">Próximo</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Sidebar Widgets -->
+    <div class="sidebar-widgets">
+        <!-- Statistics -->
+        <div class="card">
+            <div class="card-header">
+                <h3>
+                    <i class="fas fa-chart-pie"></i>
+                    Resumo do Dia
+                </h3>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-item stat-agendados">
+                    <div class="stat-number">{{ total_agendados }}</div>
+                    <div class="stat-label">Agendados</div>
+                </div>
+                <div class="stat-item stat-atendidos">
+                    <div class="stat-number">{{ agendamentos.object_list|length }}</div>
+                    <div class="stat-label">Total Hoje</div>
+                </div>
+                <div class="stat-item stat-cancelados">
+                    <div class="stat-number">{{ contratos_cancelados }}</div>
+                    <div class="stat-label">Contratos Cancelados</div>
+                </div>
+                <div class="stat-item stat-faltaram">
+                    <div class="stat-number">{{ contratos_pendentes }}</div>
+                    <div class="stat-label">Contratos Pendentes</div>
+                </div>
+            </div>
+            <div style="padding: 0 1.5rem 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <span style="font-size: 0.875rem; color: var(--gray-600);">Progresso do dia</span>
+                    <span style="font-size: 0.875rem; font-weight: 600;" id="progress-percentage">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill" style="width: 0%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Financial Summary -->
+        <div class="card">
+            <div class="card-header">
+                <h3>
+                    <i class="fas fa-money-bill-wave"></i>
+                    Financeiro Hoje
+                </h3>
+            </div>
+            <div class="financial-summary">
+                <div class="financial-item">
+                    <span class="financial-label">Entradas</span>
+                    <span class="financial-value financial-positive">R$ {{ total_entradas|floatformat:2 }}</span>
+                </div>
+                <div class="financial-item">
+                    <span class="financial-label">Saídas</span>
+                    <span class="financial-value financial-negative">R$ {{ total_saidas|floatformat:2 }}</span>
+                </div>
+                <div class="financial-item">
+                    <span class="financial-label">Saldo do Dia</span>
+                    <span class="financial-value {% if saldo >= 0 %}financial-positive{% else %}financial-negative{% endif %}">R$ {{ saldo|floatformat:2 }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contratos -->
+        <div class="card">
+            <div class="card-header">
+                <h3>
+                    <i class="fas fa-file-contract"></i>
+                    Contratos
+                </h3>
+            </div>
+            <div class="financial-summary">
+                <div class="financial-item">
+                    <span class="financial-label">Ativos</span>
+                    <span class="financial-value">{{ contratos_ativos }}</span>
+                </div>
+                <div class="financial-item">
+                    <span class="financial-label">Pendentes</span>
+                    <span class="financial-value">{{ contratos_pendentes }}</span>
+                </div>
+                <div class="financial-item">
+                    <span class="financial-label">Cancelados</span>
+                    <span class="financial-value">{{ contratos_cancelados }}</span>
+                </div>
+                <div class="financial-item">
+                    <span class="financial-label">Total</span>
+                    <span class="financial-value">{{ total_contratos }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card">
+            <div class="card-header">
+                <h3>
+                    <i class="fas fa-bolt"></i>
+                    Ações Rápidas
+                </h3>
+            </div>
+            <div class="quick-actions">
+                
+                <a href="{% url 'paciente:cadastrar_paciente' %}" class="btn-quick btn-primary">
+                    <i class="fas fa-user-plus"></i>
+                    Cadastrar Paciente
+                </a>
+                <a href="{% url 'financeiro:caixa_cadastrar' %}" class="btn-quick btn-outline">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    Lançar Movimento
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const CSRF_TOKEN = "{{ csrf_token }}";
+
+    // Função para enviar requisição AJAX
+    async function updateAppointmentStatus(agendamentoId, newStatus) {
+        try {
+            const response = await fetch(`/agendamentos/${agendamentoId}/atualizar_status/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': CSRF_TOKEN
+                },
+                body: `status=${newStatus}`
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Atualizar o DOM com base na resposta do servidor
+                const appointmentItem = document.querySelector(`button[data-agendamento-id="${agendamentoId}"]`).closest('.appointment-item');
+                const statusBadge = appointmentItem.querySelector('.status-badge');
+                statusBadge.className = `status-badge status-${data.new_status}`;
+                statusBadge.textContent = data.new_status_display;
+
+                // Remover/adicionar botões conforme a lógica de status
+                if (newStatus === 'atendido' || newStatus === 'cancelado') {
+                    appointmentItem.querySelector('.btn-check')?.remove();
+                    appointmentItem.querySelector('.btn-cancel')?.remove();
+                }
+
+                updateStats(); // Atualiza as estatísticas globais
+                
+                // Mostrar feedback visual
+                showNotification(`Agendamento ${data.new_status_display.toLowerCase()} com sucesso!`, 'success');
+            } else {
+                console.error('Erro ao atualizar status:', data.error);
+                showNotification('Erro ao atualizar status: ' + data.error, 'error');
+            }
+        } catch (error) {
+            console.error('Erro na requisição AJAX:', error);
+            showNotification('Erro de comunicação com o servidor.', 'error');
+        }
+    }
+
+    // Função para mostrar notificações
+    function showNotification(message, type) {
+        // Implementação simples com alert, você pode melhorar com toast/modal
+        if (type === 'success') {
+            alert('✅ ' + message);
+        } else {
+            alert('❌ ' + message);
+        }
+    }
+
+    // Event listeners dos botões de ação
+    document.querySelectorAll('.btn-action').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const agendamentoId = this.dataset.agendamentoId;
+
+            if (this.classList.contains('btn-check')) {
+                updateAppointmentStatus(agendamentoId, 'atendido');
+            } else if (this.classList.contains('btn-cancel')) {
+                if (confirm('Tem certeza que deseja cancelar este agendamento?')) {
+                    updateAppointmentStatus(agendamentoId, 'cancelado');
+                }
+            }
+        });
+    });
+
+    // Função para atualizar estatísticas
+    function updateStats() {
+        const appointments = document.querySelectorAll('.appointment-item');
+        let agendados = 0, atendidos = 0, cancelados = 0, faltaram = 0;
+        
+        appointments.forEach(item => {
+            const status = item.querySelector('.status-badge');
+            if (status.classList.contains('status-agendado')) agendados++;
+            else if (status.classList.contains('status-atendido')) atendidos++;
+            else if (status.classList.contains('status-cancelado')) cancelados++;
+            else if (status.classList.contains('status-faltou')) faltaram++;
+        });
+        
+        // Atualizar progresso
+        const total = appointments.length;
+        const completed = atendidos + cancelados + faltaram;
+        const progress = total > 0 ? (completed / total) * 100 : 0;
+        
+        document.getElementById('progress-fill').style.width = progress + '%';
+        document.getElementById('progress-percentage').textContent = progress.toFixed(1) + '%';
+        
+        // Atualizar badge de notificação
+        document.querySelector('.notification-badge').textContent = agendados;
+    }
+
+    // Adicionar hover effects aos itens de agendamento
+    document.querySelectorAll('.appointment-item').forEach(item => {
+        item.addEventListener('click', function() {
+            // Aqui você pode adicionar lógica para abrir detalhes do agendamento
+            const patientName = this.querySelector('.patient-name').textContent;
+            console.log('Clicou no agendamento:', patientName);
+        });
+    });
+
+    // Calcular progresso inicial
+    document.addEventListener('DOMContentLoaded', updateStats);
+</script>
+{% endblock %}
+

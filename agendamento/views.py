@@ -84,23 +84,57 @@ def agendamentos_pdf(request):
     filtro_agendamentos = AgendamentoFilter(request.GET, queryset=agendamentos_queryset)
     agendamentos_filtrados = filtro_agendamentos.qs
 
-    # Total de registros filtrados
     total = agendamentos_filtrados.count()
 
-    template_path = 'agendamento/agendamentos_pdf.html'
+    # Contagens por status (opcional)
+    total_agendado = agendamentos_filtrados.filter(status='agendado').count()
+    total_atendido = agendamentos_filtrados.filter(status='atendido').count()
+    total_remarcado = agendamentos_filtrados.filter(status='remarcado').count()
+    total_reagendado = agendamentos_filtrados.filter(status='reagendado').count()
+    total_faltou = agendamentos_filtrados.filter(status='faltou').count()
+
     context = {
         'agendamentos': agendamentos_filtrados,
         'total': total,
+        'total_agendado': total_agendado,
+        'total_atendido': total_atendido,
+        'total_remarcado': total_remarcado,
+        'total_reagendado': total_reagendado,
+        'total_faltou': total_faltou,
+        'request': request  # para uso de request.GET no template
     }
+
+    template_path = 'agendamento/agendamentos_pdf.html'
+    template = get_template(template_path)
+    html = template.render(context)
+
+    # Substitui variáveis CSS por cores reais (xhtml2pdf não entende var(--...))
+    css_vars = {
+        "var(--primary-color)": "#2563eb",
+        "var(--primary-dark)": "#1d4ed8",
+        "var(--success-color)": "#10b981",
+        "var(--warning-color)": "#f59e0b",
+        "var(--danger-color)": "#ef4444",
+        "var(--gray-50)": "#f9fafb",
+        "var(--gray-100)": "#f3f4f6",
+        "var(--gray-200)": "#e5e7eb",
+        "var(--gray-300)": "#d1d5db",
+        "var(--gray-400)": "#9ca3af",
+        "var(--gray-500)": "#6b7280",
+        "var(--gray-600)": "#4b5563",
+        "var(--gray-700)": "#374151",
+        "var(--gray-800)": "#1f2937",
+        "var(--gray-900)": "#111827",
+    }
+
+    for var_name, hex_value in css_vars.items():
+        html = html.replace(var_name, hex_value)
 
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="agendamentos.pdf"'
 
-    template = get_template(template_path)
-    html = template.render(context)
-
     pisa_status = pisa.CreatePDF(
-        html, dest=response
+        html.encode('utf-8'), dest=response
     )
 
     if pisa_status.err:

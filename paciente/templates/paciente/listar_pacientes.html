@@ -1,145 +1,822 @@
 {% extends 'core/base.html' %}
 {% block title %}Listagem de Pacientes{% endblock %}
+{% block page_title %}Listagem de Pacientes{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        color: white;
+        border-radius: 1rem;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 200px;
+        height: 200px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(50%, -50%);
+    }
+
+    .page-header .content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .page-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .page-subtitle {
+        font-size: 1.125rem;
+        opacity: 0.9;
+        margin-top: 0.5rem;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .btn-header {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-header:hover {
+        background: rgba(255, 255, 255, 0.3);
+        color: white;
+        text-decoration: none;
+        transform: translateY(-1px);
+    }
+
+    .btn-header.primary {
+        background: white;
+        color: var(--primary-color);
+        border-color: white;
+    }
+
+    .btn-header.primary:hover {
+        background: var(--gray-100);
+        color: var(--primary-color);
+    }
+
+    .filter-card {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+
+    .filter-header {
+        background: linear-gradient(135deg, var(--gray-600) 0%, var(--gray-700) 100%);
+        color: white;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .filter-title {
+        margin: 0;
+        font-size: 1.125rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .filter-body {
+        padding: 1.5rem;
+    }
+
+    .search-container {
+        position: relative;
+    }
+
+    .search-input {
+        border: 2px solid var(--gray-200);
+        border-radius: 0.75rem;
+        padding: 0.875rem 1rem 0.875rem 3rem;
+        font-size: 1rem;
+        transition: all 0.2s ease;
+        width: 100%;
+    }
+
+    .search-input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        outline: none;
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray-400);
+        font-size: 1.125rem;
+    }
+
+    .filter-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 1.5rem;
+    }
+
+    .btn-filter {
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        border: 2px solid;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+    }
+
+    .btn-filter:hover {
+        text-decoration: none;
+        transform: translateY(-1px);
+    }
+
+    .btn-search {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+
+    .btn-search:hover {
+        background: var(--primary-dark);
+        border-color: var(--primary-dark);
+        color: white;
+    }
+
+    .btn-clear {
+        background: white;
+        color: var(--gray-600);
+        border-color: var(--gray-300);
+    }
+
+    .btn-clear:hover {
+        background: var(--gray-50);
+        color: var(--gray-700);
+        border-color: var(--gray-400);
+    }
+
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        border: 1px solid var(--gray-200);
+        box-shadow: var(--shadow-sm);
+        transition: all 0.2s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+    }
+
+    .stat-icon {
+        width: 3rem;
+        height: 3rem;
+        border-radius: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+    }
+
+    .stat-icon.primary {
+        background: rgba(37, 99, 235, 0.1);
+        color: var(--primary-color);
+    }
+
+    .stat-icon.success {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success-color);
+    }
+
+    .stat-icon.info {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--info-color);
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        color: var(--gray-600);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+
+    .patients-card {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+        overflow: hidden;
+    }
+
+    .patients-header {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        color: white;
+        padding: 1.25rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .patients-title {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .patients-count {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 0.375rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+
+    .patients-table {
+        margin: 0;
+        font-size: 0.875rem;
+    }
+
+    .patients-table thead th {
+        background: var(--gray-50);
+        color: var(--gray-700);
+        font-weight: 600;
+        padding: 1rem 1.5rem;
+        border: none;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.025em;
+        border-bottom: 2px solid var(--gray-200);
+    }
+
+    .patients-table tbody td {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--gray-100);
+        vertical-align: middle;
+    }
+
+    .patients-table tbody tr {
+        transition: all 0.2s ease;
+    }
+
+    .patients-table tbody tr:hover {
+        background: var(--gray-50);
+        transform: translateX(2px);
+    }
+
+    .patients-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .patient-name {
+        font-weight: 600;
+        color: var(--gray-900);
+        margin-bottom: 0.25rem;
+    }
+
+    .patient-info {
+        font-size: 0.75rem;
+        color: var(--gray-500);
+    }
+
+    .patient-contact {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .contact-item {
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+        font-size: 0.875rem;
+        color: var(--gray-600);
+    }
+
+    .contact-icon {
+        width: 1rem;
+        color: var(--gray-400);
+    }
+
+    .actions-container {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn-action {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 0.5rem;
+        border: 1px solid;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+        position: relative;
+    }
+
+    .btn-action:hover {
+        text-decoration: none;
+        transform: translateY(-1px);
+    }
+
+    .btn-action[title]:hover::after {
+        content: attr(title);
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--gray-900);
+        color: white;
+        padding: 0.375rem 0.75rem;
+        border-radius: 0.375rem;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        z-index: 10;
+        margin-bottom: 0.25rem;
+    }
+
+    .btn-edit {
+        background: white;
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .btn-edit:hover {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .btn-delete {
+        background: white;
+        color: var(--danger-color);
+        border-color: var(--danger-color);
+    }
+
+    .btn-delete:hover {
+        background: var(--danger-color);
+        color: white;
+    }
+
+    .btn-profile {
+        background: white;
+        color: var(--info-color);
+        border-color: var(--info-color);
+    }
+
+    .btn-profile:hover {
+        background: var(--info-color);
+        color: white;
+    }
+
+    .btn-schedule {
+        background: white;
+        color: var(--success-color);
+        border-color: var(--success-color);
+    }
+
+    .btn-schedule:hover {
+        background: var(--success-color);
+        color: white;
+    }
+
+    .btn-contract {
+        background: white;
+        color: var(--warning-color);
+        border-color: var(--warning-color);
+    }
+
+    .btn-contract:hover {
+        background: var(--warning-color);
+        color: white;
+    }
+
+    .pagination-container {
+        padding: 1.5rem;
+        background: var(--gray-50);
+        border-top: 1px solid var(--gray-200);
+    }
+
+    .pagination {
+        margin: 0;
+        justify-content: center;
+    }
+
+    .page-link {
+        border: 1px solid var(--gray-300);
+        color: var(--gray-600);
+        padding: 0.5rem 0.75rem;
+        margin: 0 0.125rem;
+        border-radius: 0.375rem;
+        transition: all 0.2s ease;
+    }
+
+    .page-link:hover {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+    }
+
+    .page-item.active .page-link {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+    }
+
+    .pagination-info {
+        text-align: center;
+        margin-top: 1rem;
+        color: var(--gray-600);
+        font-size: 0.875rem;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--gray-500);
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 1.5rem;
+        opacity: 0.5;
+    }
+
+    .empty-state h3 {
+        color: var(--gray-600);
+        margin-bottom: 1rem;
+    }
+
+    .empty-state p {
+        font-size: 1.125rem;
+        margin-bottom: 2rem;
+    }
+
+    .empty-state .btn {
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 1.5rem;
+        }
+
+        .page-header .content {
+            flex-direction: column;
+            gap: 1rem;
+            text-align: center;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+        }
+
+        .header-actions {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .stats-container {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .filter-body {
+            padding: 1rem;
+        }
+
+        .filter-actions {
+            flex-direction: column;
+        }
+
+        .patients-table thead th,
+        .patients-table tbody td {
+            padding: 0.75rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .actions-container {
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .btn-action {
+            width: 100%;
+            height: 2rem;
+            border-radius: 0.375rem;
+        }
+
+        .pagination-container {
+            padding: 1rem;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-
-    <div class="card shadow mb-4">
-        <div class="card-header bg-secondary text-white">
-            <h5 class="mb-0">Filtrar Pacientes</h5>
+<!-- Cabeçalho da Página -->
+<div class="page-header">
+    <div class="content">
+        <div>
+            <h1 class="page-title">
+                <i class="fas fa-users"></i>
+                Pacientes
+            </h1>
+            <div class="page-subtitle">Gerenciamento completo de pacientes</div>
         </div>
-        <div class="card-body">
-            <form method="get">
-                <div class="row g-3">
-                    <div class="col-md-8">
-                        <label for="busca">Buscar por Nome ou CPF:</label>
-                        <input type="text" id="busca" name="busca" class="form-control" placeholder="Digite nome ou CPF" value="{{ request.GET.busca }}">
-                    </div>
-                </div>
-                <div class="d-flex justify-content-end mt-4">
-                    <button type="submit" class="btn btn-primary me-2">
-                        <i class="fas fa-search me-1"></i> Pesquisar
-                    </button>
-                    <a href="{% url 'paciente:listar_pacientes' %}" class="btn btn-outline-secondary">
-                        <i class="fas fa-eraser me-1"></i> Limpar
-                    </a>
-                </div>
-            </form>
+        <div class="header-actions">
+            <a href="{% url 'paciente:cadastrar_paciente' %}" class="btn-header primary">
+                <i class="fas fa-plus"></i>
+                Novo Paciente
+            </a>
         </div>
     </div>
-
-    <!-- Botão novo paciente -->
-    <div class="d-flex justify-content-end mb-3">
-        <a href="{% url 'paciente:cadastrar_paciente' %}" class="btn btn-success me-2">
-            <i class="fas fa-plus me-1"></i> Novo Paciente
-        </a>
-    </div>
-
-    <!-- Listagem -->
-    <div class="card shadow">
-        <div class="card-header bg-primary text-white">
-            <h4 class="mb-0">Pacientes</h4>
-        </div>
-        <div class="card-body p-0">
-            {% if pacientes %}
-                <div class="table-responsive">
-                    <table class="table table-hover table-bordered mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Nome</th>
-                                <th>CPF</th>
-                                <th>Telefone</th>
-                                <th>Nascimento</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for paciente in pacientes %}
-                            <tr>
-                                <td>{{ paciente.nome }}</td>
-                                <td>{{ paciente.cpf }}</td>
-                                <td>{{ paciente.telefone }}</td>
-                                <td>{{ paciente.data_nascimento|date:"d/m/Y" }}</td>
-                                <td class="text-center">
-                                  <div class="btn-group btn-group-sm" role="group">
-                                       <a href="{% url 'paciente:editar_paciente' paciente.id %}" class="btn btn-outline-primary" title="Abrir">
-                                         <i class="fas fa-edit"></i>
-                                        </a>
-                                       <a href="{% url 'paciente:excluir_paciente' paciente.id %}" class="btn btn-outline-danger" title="Excluir">
-                                         <i class="fas fa-trash-alt"></i>
-                                        </a>
-                                        <a href="{% url 'financeiro:paciente_ficha' paciente.id %}" class="btn btn-outline-info" title="Cadastro">
-                                         <i class="fas fa-id-card"></i>
-                                        </a>
-                                        <a href="{% url 'agendamento:agendar_paciente' paciente.id %}" class="btn btn-outline-secondary" title="Agendar">
-                                         <i class="fas fa-calendar"></i>
-                                        </a>
-                                        <a href="{% url 'financeiro:contrato_paciente' paciente.id %}" class="btn btn-outline-primary btn-sm" title="Novo contrato">
-                                         <i class="fas fa-file-signature"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                
-                <!-- Paginação IDÊNTICA ao template de Contratos -->
-                <div class="p-3">
-                    <nav aria-label="Page navigation">
-                        <ul class="pagination justify-content-center">
-                            {% if pacientes.has_previous %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page=1{% if request.GET.busca %}&busca={{ request.GET.busca }}{% endif %}" aria-label="First">
-                                        <span aria-hidden="true">&laquo;&laquo;</span>
-                                    </a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ pacientes.previous_page_number }}{% if request.GET.busca %}&busca={{ request.GET.busca }}{% endif %}" aria-label="Previous">
-                                        <span aria-hidden="true">&laquo;</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-                            
-                            {% for num in pacientes.paginator.page_range %}
-                                {% if pacientes.number == num %}
-                                    <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
-                                {% elif num > pacientes.number|add:'-3' and num < pacientes.number|add:'3' %}
-                                    <li class="page-item">
-                                        <a class="page-link" href="?page={{ num }}{% if request.GET.busca %}&busca={{ request.GET.busca }}{% endif %}">{{ num }}</a>
-                                    </li>
-                                {% endif %}
-                            {% endfor %}
-                            
-                            {% if pacientes.has_next %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ pacientes.next_page_number }}{% if request.GET.busca %}&busca={{ request.GET.busca }}{% endif %}" aria-label="Next">
-                                        <span aria-hidden="true">&raquo;</span>
-                                    </a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ pacientes.paginator.num_pages }}{% if request.GET.busca %}&busca={{ request.GET.busca }}{% endif %}" aria-label="Last">
-                                        <span aria-hidden="true">&raquo;&raquo;</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-                        </ul>
-                    </nav>
-                    <div class="text-center text-muted">
-                        Página {{ pacientes.number }} de {{ pacientes.paginator.num_pages }} - Total de {{ pacientes.paginator.count }} registros
-                    </div>
-                </div>
-            {% else %}
-                <div class="p-3 text-center text-muted">
-                    Nenhum paciente encontrado.
-                </div>
-            {% endif %}
-        </div>
-    </div>
-
 </div>
 
+<!-- Estatísticas Rápidas -->
+<div class="stats-container">
+    <div class="stat-card">
+        <div class="stat-icon primary">
+            <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-number">{{ pacientes.paginator.count }}</div>
+        <div class="stat-label">Total de Pacientes</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon success">
+            <i class="fas fa-user-check"></i>
+        </div>
+        <div class="stat-number">{{ pacientes|length }}</div>
+        <div class="stat-label">Nesta Página</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon info">
+            <i class="fas fa-search"></i>
+        </div>
+        <div class="stat-number">{% if request.GET.busca %}Sim{% else %}Não{% endif %}</div>
+        <div class="stat-label">Filtro Ativo</div>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="filter-card">
+    <div class="filter-header">
+        <h5 class="filter-title">
+            <i class="fas fa-filter"></i>
+            Filtrar Pacientes
+        </h5>
+    </div>
+    <div class="filter-body">
+        <form method="get">
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" 
+                       id="busca" 
+                       name="busca" 
+                       class="search-input" 
+                       placeholder="Digite nome ou CPF do paciente..." 
+                       value="{{ request.GET.busca }}"
+                       autocomplete="off">
+            </div>
+            <div class="filter-actions">
+                <button type="submit" class="btn-filter btn-search">
+                    <i class="fas fa-search"></i>
+                    Pesquisar
+                </button>
+                <a href="{% url 'paciente:listar_pacientes' %}" class="btn-filter btn-clear">
+                    <i class="fas fa-eraser"></i>
+                    Limpar Filtros
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Lista de Pacientes -->
+<div class="patients-card">
+    <div class="patients-header">
+        <h4 class="patients-title">
+            <i class="fas fa-list"></i>
+            Lista de Pacientes
+        </h4>
+        <div class="patients-count">
+            {{ pacientes.paginator.count }} pacientes
+        </div>
+    </div>
+    
+    {% if pacientes %}
+        <div class="table-responsive">
+            <table class="patients-table table">
+                <thead>
+                    <tr>
+                        <th><i class="fas fa-user me-2"></i>Paciente</th>
+                        <th><i class="fas fa-id-card me-2"></i>CPF</th>
+                        <th><i class="fas fa-phone me-2"></i>Contato</th>
+                        <th><i class="fas fa-birthday-cake me-2"></i>Nascimento</th>
+                        <th><i class="fas fa-cogs me-2"></i>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for paciente in pacientes %}
+                    <tr>
+                        <td>
+                            <div class="patient-name">{{ paciente.nome }}</div>
+                            <div class="patient-info">ID: #{{ paciente.id }}</div>
+                        </td>
+                        <td>
+                            <strong>{{ paciente.cpf }}</strong>
+                        </td>
+                        <td>
+                            <div class="patient-contact">
+                                {% if paciente.telefone %}
+                                <div class="contact-item">
+                                    <i class="fas fa-phone contact-icon"></i>
+                                    {{ paciente.telefone }}
+                                </div>
+                                {% endif %}
+                                {% if paciente.email %}
+                                <div class="contact-item">
+                                    <i class="fas fa-envelope contact-icon"></i>
+                                    {{ paciente.email }}
+                                </div>
+                                {% else %}
+                                <div class="contact-item">
+                                    <i class="fas fa-envelope contact-icon"></i>
+                                    <span class="text-muted">Não informado</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            <strong>{{ paciente.data_nascimento|date:"d/m/Y" }}</strong>
+                        </td>
+                        <td>
+                            <div class="actions-container">
+                                <a href="{% url 'paciente:editar_paciente' paciente.id %}" 
+                                   class="btn-action btn-edit" 
+                                   title="Editar Paciente">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'financeiro:paciente_ficha' paciente.id %}" 
+                                   class="btn-action btn-profile" 
+                                   title="Ver Ficha">
+                                    <i class="fas fa-id-card"></i>
+                                </a>
+                                <a href="{% url 'agendamento:agendar_paciente' paciente.id %}" 
+                                   class="btn-action btn-schedule" 
+                                   title="Agendar Consulta">
+                                    <i class="fas fa-calendar-plus"></i>
+                                </a>
+                                <a href="{% url 'financeiro:contrato_paciente' paciente.id %}" 
+                                   class="btn-action btn-contract" 
+                                   title="Novo Contrato">
+                                    <i class="fas fa-file-signature"></i>
+                                </a>
+                                <a href="{% url 'paciente:excluir_paciente' paciente.id %}" 
+                                   class="btn-action btn-delete" 
+                                   title="Excluir Paciente"
+                                   onclick="return confirm('Tem certeza que deseja excluir este paciente?');">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Paginação -->
+        <div class="pagination-container">
+            <nav aria-label="Navegação de páginas">
+                <ul class="pagination">
+                    {% if pacientes.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1{% if request.GET.busca %}&busca={{ request.GET.busca }}{% endif %}" aria-label="Primeira">
+                                <i class="fas fa-angle-double-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ pacientes.previous_page_number }}{% if request.GET.busca %}&busca={{ request.GET.busca }}{% endif %}" aria-label="Anterior">
+                                <i class="fas fa-angle-left"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                    
+                    {% for num in pacientes.paginator.page_range %}
+                        {% if pacientes.number == num %}
+                            <li class="page-item active">
+                                <a class="page-link" href="#">{{ num }}</a>
+                            </li>
+                        {% elif num > pacientes.number|add:'-3' and num < pacientes.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if request.GET.busca %}&busca={{ request.GET.busca }}{% endif %}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if pacientes.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ pacientes.next_page_number }}{% if request.GET.busca %}&busca={{ request.GET.busca }}{% endif %}" aria-label="Próxima">
+                                <i class="fas fa-angle-right"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ pacientes.paginator.num_pages }}{% if request.GET.busca %}&busca={{ request.GET.busca }}{% endif %}" aria-label="Última">
+                                <i class="fas fa-angle-double-right"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            <div class="pagination-info">
+                Página {{ pacientes.number }} de {{ pacientes.paginator.num_pages }} - 
+                Total de {{ pacientes.paginator.count }} pacientes
+            </div>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-user-slash"></i>
+            <h3>Nenhum paciente encontrado</h3>
+            <p>{% if request.GET.busca %}Não encontramos pacientes com os critérios de busca informados.{% else %}Ainda não há pacientes cadastrados no sistema.{% endif %}</p>
+            {% if not request.GET.busca %}
+                <a href="{% url 'paciente:cadastrar_paciente' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>
+                    Cadastrar Primeiro Paciente
+                </a>
+            {% else %}
+                <a href="{% url 'paciente:listar_pacientes' %}" class="btn btn-secondary">
+                    <i class="fas fa-list me-2"></i>
+                    Ver Todos os Pacientes
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
 <!-- Scripts para o autocomplete -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
@@ -147,10 +824,40 @@
 
 <script>
 $(function() {
+    // Autocomplete para busca de pacientes
     $("#busca").autocomplete({
-        source: "{% url 'paciente:autocomplete_paciente' %}"
+        source: "{% url 'paciente:autocomplete_paciente' %}",
+        minLength: 2,
+        select: function(event, ui) {
+            // Submete o formulário automaticamente quando um item é selecionado
+            setTimeout(function() {
+                $('form').submit();
+            }, 100);
+        }
+    });
+
+    // Foco automático no campo de busca
+    $("#busca").focus();
+
+    // Animação suave para os cards de estatísticas
+    $('.stat-card').each(function(index) {
+        $(this).css('animation-delay', (index * 0.1) + 's');
+        $(this).addClass('animate-fade-in');
     });
 });
-</script>
 
+// Adiciona animação CSS
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease-out forwards;
+    }
+`;
+document.head.appendChild(style);
+</script>
 {% endblock %}
+
