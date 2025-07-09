@@ -5,8 +5,10 @@
 <div class="container mt-4">
 
     <div class="card shadow mb-4">
-        <div class="card-header bg-secondary text-white">
-            <h5 class="mb-0">Filtrar Contratos</h5>
+        <div class="card-header py-3 bg-primary text-white">
+          <h5 class="mb-0">
+              <i class="fas fa-filter"></i> Filtrar contratos
+          </h5>
         </div>
         <div class="card-body">
             <form method="get">
@@ -42,8 +44,10 @@
 
     <!-- Listagem -->
     <div class="card shadow">
-        <div class="card-header bg-primary text-white">
-            <h4 class="mb-0">Contratos</h4>
+        <div class="card-header py-3 bg-primary text-white">
+            <h4 class="mb-0">
+             <i class="fas fa-file-alt me-2"></i> Contratos
+            </h4>
         </div>
         <div class="card-body p-0">
             {% if contratos %}
@@ -70,7 +74,7 @@
                                 <td>Dia {{ contrato.dia_vencimento }}</td>
                                 <td>{{ contrato.get_status_contrato_display }}</td>
                                 <td class="text-center">
-                                  <div class="btn-group btn-group-sm" role="group">
+                                    <div class="action-buttons">
                                       <a href="{% url 'financeiro:contrato_editar' contrato.id %}" class="btn btn-outline-primary" title="Abrir">
                                          <i class="fas fa-edit"></i>
                                         </a>

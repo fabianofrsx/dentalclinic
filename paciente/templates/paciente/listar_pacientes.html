@@ -682,7 +682,7 @@
                     <tr>
                         <td>
                             <div class="patient-name">{{ paciente.nome }}</div>
-                            <div class="patient-info">ID: #{{ paciente.id }}</div>
+                            
                         </td>
                         <td>
                             <strong>{{ paciente.cpf }}</strong>
@@ -695,17 +695,7 @@
                                     {{ paciente.telefone }}
                                 </div>
                                 {% endif %}
-                                {% if paciente.email %}
-                                <div class="contact-item">
-                                    <i class="fas fa-envelope contact-icon"></i>
-                                    {{ paciente.email }}
-                                </div>
-                                {% else %}
-                                <div class="contact-item">
-                                    <i class="fas fa-envelope contact-icon"></i>
-                                    <span class="text-muted">Não informado</span>
-                                </div>
-                                {% endif %}
+                               
                             </div>
                         </td>
                         <td>
