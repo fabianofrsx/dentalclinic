@@ -1,164 +1,662 @@
 {% extends 'core/base.html' %}
+
 {% block title %}Listagem de Contratos{% endblock %}
+{% block page_title %}Listagem de Contratos{% endblock %}
+
+{% block extra_css %}
+<style>
+    .filter-card {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+        margin-bottom: 2rem;
+    }
+
+    .filter-header {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        color: white;
+        padding: 1.5rem 2rem;
+        border-radius: 1rem 1rem 0 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .filter-header h5 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 1.25rem;
+    }
+
+    .filter-body {
+        padding: 2rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: var(--gray-700);
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .form-control, .form-select {
+        border: 1px solid var(--gray-300);
+        border-radius: 0.5rem;
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .btn-filter {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-filter:hover {
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+        color: white;
+    }
+
+    .btn-clear {
+        background: transparent;
+        color: var(--gray-600);
+        border: 2px solid var(--gray-300);
+        border-radius: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+    }
+
+    .btn-clear:hover {
+        background: var(--gray-100);
+        border-color: var(--gray-400);
+        color: var(--gray-700);
+        text-decoration: none;
+    }
+
+    .summary-card {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+        margin-bottom: 2rem;
+    }
+
+    .summary-header {
+        background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%);
+        color: white;
+        padding: 1.5rem 2rem;
+        border-radius: 1rem 1rem 0 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .summary-header h5 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 1.25rem;
+    }
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1.5rem;
+        padding: 2rem;
+    }
+
+    .summary-item {
+        text-align: center;
+        padding: 1.5rem 1rem;
+        border-radius: 0.75rem;
+        background: var(--gray-50);
+        transition: all 0.2s ease;
+    }
+
+    .summary-item:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+    }
+
+    .summary-number {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .summary-label {
+        font-size: 0.875rem;
+        color: var(--gray-600);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+
+    .summary-total .summary-number { color: var(--gray-800); }
+    .summary-ativos .summary-number { color: var(--success-color); }
+    .summary-inativos .summary-number { color: var(--danger-color); }
+    .summary-suspensos .summary-number { color: var(--warning-color); }
+
+    .actions-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .btn-pdf {
+        background: var(--danger-color);
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+    }
+
+    .btn-pdf:hover {
+        background: #dc2626;
+        transform: translateY(-1px);
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-novo {
+        background: var(--success-color);
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+    }
+
+    .btn-novo:hover {
+        background: #059669;
+        transform: translateY(-1px);
+        color: white;
+        text-decoration: none;
+    }
+
+    .table-card {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+        overflow: hidden;
+    }
+
+    .table-header {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        color: white;
+        padding: 1.5rem 2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .table-header h4 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 1.5rem;
+    }
+
+    .modern-table {
+        margin: 0;
+        font-size: 0.875rem;
+    }
+
+    .modern-table thead th {
+        background: var(--gray-50);
+        color: var(--gray-700);
+        font-weight: 600;
+        padding: 1rem 1.5rem;
+        border: none;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.025em;
+    }
+
+    .modern-table tbody td {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--gray-100);
+        vertical-align: middle;
+    }
+
+    .modern-table tbody tr {
+        transition: all 0.2s ease;
+    }
+
+    .modern-table tbody tr:hover {
+        background: var(--gray-50);
+    }
+
+    .modern-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .status-badge {
+        padding: 0.375rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+        display: inline-block;
+    }
+
+    .status-ativo {
+        background: #d1fae5;
+        color: var(--success-color);
+    }
+
+    .status-inativo {
+        background: #fee2e2;
+        color: var(--danger-color);
+    }
+
+    .status-suspenso {
+        background: #fef3c7;
+        color: var(--warning-color);
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+    }
+
+    .btn-action {
+        width: 36px;
+        height: 36px;
+        border-radius: 0.5rem;
+        border: 1px solid;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 0.875rem;
+        text-decoration: none;
+    }
+
+    .btn-action:hover {
+        transform: scale(1.05);
+        text-decoration: none;
+    }
+
+    .btn-edit {
+        background: white;
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .btn-edit:hover {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .btn-delete {
+        background: white;
+        color: var(--danger-color);
+        border-color: var(--danger-color);
+    }
+
+    .btn-delete:hover {
+        background: var(--danger-color);
+        color: white;
+    }
+
+    .btn-pdf-small {
+        background: white;
+        color: var(--danger-color);
+        border-color: var(--danger-color);
+    }
+
+    .btn-pdf-small:hover {
+        background: var(--danger-color);
+        color: white;
+    }
+
+    .pagination-wrapper {
+        padding: 2rem;
+        background: var(--gray-50);
+        border-radius: 0 0 1rem 1rem;
+    }
+
+    .pagination {
+        margin: 0;
+        justify-content: center;
+    }
+
+    .page-link {
+        border: 1px solid var(--gray-300);
+        color: var(--gray-600);
+        padding: 0.75rem 1rem;
+        margin: 0 0.125rem;
+        border-radius: 0.5rem;
+        transition: all 0.2s ease;
+    }
+
+    .page-link:hover {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+    }
+
+    .page-item.active .page-link {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+    }
+
+    .pagination-info {
+        text-align: center;
+        margin-top: 1rem;
+        color: var(--gray-600);
+        font-size: 0.875rem;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--gray-500);
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 1.5rem;
+        opacity: 0.5;
+    }
+
+    .empty-state h5 {
+        color: var(--gray-600);
+        margin-bottom: 1rem;
+    }
+
+    .empty-state p {
+        color: var(--gray-500);
+        margin-bottom: 0;
+    }
+
+    @media (max-width: 768px) {
+        .summary-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            padding: 1.5rem;
+        }
+
+        .summary-item {
+            padding: 1rem 0.5rem;
+        }
+
+        .summary-number {
+            font-size: 1.5rem;
+        }
+
+        .actions-bar {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: stretch;
+        }
+
+        .modern-table {
+            font-size: 0.75rem;
+        }
+
+        .modern-table thead th,
+        .modern-table tbody td {
+            padding: 0.75rem 0.5rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .btn-action {
+            width: 32px;
+            height: 32px;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-
-    <div class="card shadow mb-4">
-        <div class="card-header py-3 bg-primary text-white">
-          <h5 class="mb-0">
-              <i class="fas fa-filter"></i> Filtrar contratos
-          </h5>
-        </div>
-        <div class="card-body">
-            <form method="get">
-                <div class="row g-3">
-                    <div class="col-md-5">
-                        <label for="busca">Buscar por Nome ou CPF:</label>
-                        <input type="text" id="busca" name="busca" class="form-control" placeholder="Digite nome ou CPF" value="{{ request.GET.busca }}">
-                    </div>
-                    <div class="col-md-5">
-                        <label for="{{ filter.form.status_contrato.id_for_label }}">Status:</label>
-                        {{ filter.form.status_contrato }}
-                    </div>
-                </div>
-                <div class="d-flex justify-content-end mt-4">
-                    <button type="submit" class="btn btn-primary me-2">
-                        <i class="fas fa-search me-1"></i> Pesquisar
-                    </button>
-                    <a href="{% url 'financeiro:contrato_listar' %}" class="btn btn-outline-secondary">
-                        <i class="fas fa-eraser me-1"></i> Limpar
-                    </a>
-                </div>
-            </form>
-        </div>
+<!-- Filtros -->
+<div class="filter-card">
+    <div class="filter-header py-3">
+        <i class="fas fa-filter"></i>
+        <h5>Filtrar Contratos</h5>
     </div>
+    <div class="filter-body">
+        <form method="get" id="filter-form">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="busca" class="form-label">
+                        <i class="fas fa-search me-1"></i>Buscar Paciente
+                    </label>
+                    <input type="text" id="busca" name="busca" class="form-control" 
+                           placeholder="Digite nome ou CPF" value="{{ request.GET.busca }}">
+                </div>
+                <div class="col-md-6">
+                    <label for="{{ filter.form.status_contrato.id_for_label }}" class="form-label">
+                        <i class="fas fa-info-circle me-1"></i>Status
+                    </label>
+                    {{ filter.form.status_contrato }}
+                </div>
+            </div>
 
-    <!-- Botão novo contrato -->
-    <div class="d-flex justify-content-end mb-3">
-         
-        <a href="{% url 'financeiro:contrato_exportar_pdf' %}?{{ request.GET.urlencode }}" class="btn btn-danger mb-2">
-         Exportar PDF
-         </a>
+            <div class="d-flex justify-content-end mt-4 gap-2">
+                <button type="submit" class="btn-filter">
+                    <i class="fas fa-search"></i>
+                    Pesquisar
+                </button>
+                <a href="{% url 'financeiro:contrato_listar' %}" class="btn-clear">
+                    <i class="fas fa-eraser"></i>
+                    Limpar Filtros
+                </a>
+            </div>
+        </form>
     </div>
-
-    <!-- Listagem -->
-    <div class="card shadow">
-        <div class="card-header py-3 bg-primary text-white">
-            <h4 class="mb-0">
-             <i class="fas fa-file-alt me-2"></i> Contratos
-            </h4>
-        </div>
-        <div class="card-body p-0">
-            {% if contratos %}
-                <div class="table-responsive">
-                    <table class="table table-hover table-bordered mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Contrato</th>
-                                <th>Paciente</th>
-                                <th>Plano</th>
-                                <th>Adesão</th>
-                                <th>Vencimento</th>
-                                <th>Status</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for contrato in contratos %}
-                            <tr>
-                                <td>{{ contrato.numero_contrato }}</td>
-                                <td>{{ contrato.paciente.nome }}</td>
-                                <td>{{ contrato.plano.nome }}</td>
-                                <td>{{ contrato.data_adesao|date:"d/m/Y" }}</td>
-                                <td>Dia {{ contrato.dia_vencimento }}</td>
-                                <td>{{ contrato.get_status_contrato_display }}</td>
-                                <td class="text-center">
-                                    <div class="action-buttons">
-                                      <a href="{% url 'financeiro:contrato_editar' contrato.id %}" class="btn btn-outline-primary" title="Abrir">
-                                         <i class="fas fa-edit"></i>
-                                        </a>
-                                       <a href="{% url 'financeiro:contrato_excluir' contrato.id %}" class="btn btn-outline-danger" title="Excluir">
-                                         <i class="fas fa-trash-alt"></i>
-                                        </a>
-                                        <a href="{% url 'financeiro:gerar_carne_pdf' contrato.id %}" class="btn btn-outline-primary" target="_blank">
-                                         <i class="fas fa-file-pdf"></i> Carnê
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                
-                <!-- Paginação IDÊNTICA ao template de Lançamentos -->
-                <div class="p-3">
-                    <nav aria-label="Page navigation">
-                        <ul class="pagination justify-content-center">
-                            {% if contratos.has_previous %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page=1{% if request.GET.paciente %}&paciente={{ request.GET.paciente }}{% endif %}{% if request.GET.status_contrato %}&status_contrato={{ request.GET.status_contrato }}{% endif %}" aria-label="First">
-                                        <span aria-hidden="true">&laquo;&laquo;</span>
-                                    </a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ contratos.previous_page_number }}{% if request.GET.paciente %}&paciente={{ request.GET.paciente }}{% endif %}{% if request.GET.status_contrato %}&status_contrato={{ request.GET.status_contrato }}{% endif %}" aria-label="Previous">
-                                        <span aria-hidden="true">&laquo;</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-                            
-                            {% for num in contratos.paginator.page_range %}
-                                {% if contratos.number == num %}
-                                    <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
-                                {% elif num > contratos.number|add:'-3' and num < contratos.number|add:'3' %}
-                                    <li class="page-item">
-                                        <a class="page-link" href="?page={{ num }}{% if request.GET.paciente %}&paciente={{ request.GET.paciente }}{% endif %}{% if request.GET.status_contrato %}&status_contrato={{ request.GET.status_contrato }}{% endif %}">{{ num }}</a>
-                                    </li>
-                                {% endif %}
-                            {% endfor %}
-                            
-                            {% if contratos.has_next %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ contratos.next_page_number }}{% if request.GET.paciente %}&paciente={{ request.GET.paciente }}{% endif %}{% if request.GET.status_contrato %}&status_contrato={{ request.GET.status_contrato }}{% endif %}" aria-label="Next">
-                                        <span aria-hidden="true">&raquo;</span>
-                                    </a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ contratos.paginator.num_pages }}{% if request.GET.paciente %}&paciente={{ request.GET.paciente }}{% endif %}{% if request.GET.status_contrato %}&status_contrato={{ request.GET.status_contrato }}{% endif %}" aria-label="Last">
-                                        <span aria-hidden="true">&raquo;&raquo;</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-                        </ul>
-                    </nav>
-                    <div class="text-center text-muted">
-                        Página {{ contratos.number }} de {{ contratos.paginator.num_pages }} - Total de {{ contratos.paginator.count }} registros
-                    </div>
-                </div>
-            {% else %}
-                <div class="p-3 text-center text-muted">
-                    Nenhum contrato encontrado.
-                </div>
-            {% endif %}
-        </div>
-    </div>
-
 </div>
 
-<!-- Adicione os scripts se ainda não tiver -->
+<!-- Barra de Ações -->
+<div class="actions-bar">
+    <a href="{% url 'financeiro:contrato_exportar_pdf' %}?{{ request.GET.urlencode }}" class="btn-pdf">
+      <i class="fas fa-file-pdf"></i>
+      Exportar PDF
+    </a>
+</div>
+
+<!-- Tabela de Contratos -->
+<div class="table-card">
+    <div class="table-header py-3">
+        <i class="fas fa-file-contract"></i>
+        <h4>Contratos</h4>
+    </div>
+    
+    {% if contratos %}
+        <div class="table-responsive">
+            <table class="table modern-table">
+                <thead>
+                    <tr>
+                        <th><i class="fas fa-hashtag me-1"></i>Contrato</th>
+                        <th><i class="fas fa-user me-1"></i>Paciente</th>
+                        <th><i class="fas fa-heartbeat me-1"></i>Plano</th>
+                        <th><i class="fas fa-calendar-plus me-1"></i>Adesão</th>
+                        <th><i class="fas fa-calendar-check me-1"></i>Vencimento</th>
+                        <th><i class="fas fa-info-circle me-1"></i>Status</th>
+                        <th class="text-center"><i class="fas fa-cogs me-1"></i>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contrato in contratos %}
+                    <tr>
+                        <td>
+                            <strong>{{ contrato.numero_contrato }}</strong>
+                        </td>
+                        <td>{{ contrato.paciente.nome }}</td>
+                        <td>{{ contrato.plano.nome }}</td>
+                        <td>{{ contrato.data_adesao|date:"d/m/Y" }}</td>
+                        <td>Dia {{ contrato.dia_vencimento }}</td>
+                        <td>
+                            {% if contrato.status_contrato == 'ativo' %}
+                                <span class="status-badge status-ativo">Ativo</span>
+                            {% elif contrato.status_contrato == 'inativo' %}
+                                <span class="status-badge status-inativo">Inativo</span>
+                            {% elif contrato.status_contrato == 'suspenso' %}
+                                <span class="status-badge status-suspenso">Suspenso</span>
+                            {% else %}
+                                <span class="status-badge">{{ contrato.get_status_contrato_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{% url 'financeiro:contrato_editar' contrato.id %}" class="btn-action btn-edit" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'financeiro:contrato_excluir' contrato.id %}" class="btn-action btn-delete" title="Excluir">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                                <a href="{% url 'financeiro:gerar_carne_pdf' contrato.id %}" class="btn-action btn-pdf-small" title="Carnê PDF" target="_blank">
+                                    <i class="fas fa-file-pdf"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginação -->
+        {% if contratos.has_other_pages %}
+        <div class="pagination-wrapper">
+            <nav aria-label="Navegação de páginas">
+                <ul class="pagination">
+                    {% if contratos.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1{% if request.GET %}&{{ request.GET.urlencode }}{% endif %}" 
+                               aria-label="Primeira página">
+                                <i class="fas fa-angle-double-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ contratos.previous_page_number }}{% if request.GET %}&{{ request.GET.urlencode }}{% endif %}" 
+                               aria-label="Página anterior">
+                                <i class="fas fa-angle-left"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in contratos.paginator.page_range %}
+                        {% if contratos.number == num %}
+                            <li class="page-item active">
+                                <a class="page-link" href="#">{{ num }}</a>
+                            </li>
+                        {% elif num > contratos.number|add:'-3' and num < contratos.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if request.GET %}&{{ request.GET.urlencode }}{% endif %}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if contratos.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ contratos.next_page_number }}{% if request.GET %}&{{ request.GET.urlencode }}{% endif %}" 
+                               aria-label="Próxima página">
+                                <i class="fas fa-angle-right"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ contratos.paginator.num_pages }}{% if request.GET %}&{{ request.GET.urlencode }}{% endif %}" 
+                               aria-label="Última página">
+                                <i class="fas fa-angle-double-right"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            <div class="pagination-info">
+                Página {{ contratos.number }} de {{ contratos.paginator.num_pages }} - 
+                Total de {{ contratos.paginator.count }} registros
+            </div>
+        </div>
+        {% endif %}
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-file-contract"></i>
+            <h5>Nenhum contrato encontrado</h5>
+            <p>Não há contratos que correspondam aos filtros aplicados.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
 
 <script>
 $(function() {
+    // Autocomplete para busca de pacientes
     $("#busca").autocomplete({
         source: "{% url 'agendamento:autocomplete_paciente' %}",
-        minLength: 2
+        minLength: 2,
+        select: function(event, ui) {
+            $(this).val(ui.item.value);
+            $("#filter-form").submit();
+        }
+    });
+
+    // Adicionar classes do Bootstrap aos campos do filtro
+    $("#{{ filter.form.status_contrato.id_for_label }}").addClass("form-select");
+
+    // Animações suaves para os cards de resumo
+    const summaryItems = document.querySelectorAll('.summary-item');
+    summaryItems.forEach((item, index) => {
+        setTimeout(() => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateY(20px)';
+            item.style.transition = 'all 0.5s ease';
+            
+            setTimeout(() => {
+                item.style.opacity = '1';
+                item.style.transform = 'translateY(0)';
+            }, 100);
+        }, index * 100);
     });
 });
 </script>
-
 {% endblock %}
