@@ -31,7 +31,7 @@ def agendar(request):
     else:
         form = AgendamentoForm()
         form_dentista = DentistaForm()
-
+    
     return render(request, 'agendamento/agendar.html', {
         'form': form,
         'form_dentista': form_dentista
@@ -180,11 +180,15 @@ def cadastro_dentista(request):
         form = DentistaForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect(request.META.get('HTTP_REFERER', 'agendamento:novo_agendamento'))
-    else:
-        form = DentistaForm()
-
-    return render(request, 'cadastro_dentista_modal.html', {'form_dentista': form})
+            return redirect('agendamento:agendar')  # Redireciona para a página de agendamento
+        else:
+            # Se o formulário for inválido, re-renderizar a página agendar com os erros
+            form_agendamento = AgendamentoForm()
+            return render(request, 'agendamento/agendar.html', {
+                'form': form_agendamento,
+                'form_dentista': form
+            })
+    return redirect('agendamento:agendar')  # Redireciona para agendar se não for POST
 
 def agendar_paciente(request, paciente_id):
     paciente = get_object_or_404(Paciente, id=paciente_id)
