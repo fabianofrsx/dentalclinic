@@ -23,6 +23,7 @@
         gap: 1.5rem;
     }
 
+    /* Estilos para os agendamentos */
     .appointment-item {
         padding: 1.5rem 2rem;
         border-bottom: 1px solid var(--gray-100);
@@ -35,10 +36,6 @@
 
     .appointment-item:hover {
         background: var(--gray-50);
-    }
-
-    .appointment-item:last-child {
-        border-bottom: none;
     }
 
     .appointment-time {
@@ -71,6 +68,7 @@
         gap: 1rem;
     }
 
+    /* Status dos agendamentos */
     .status-badge {
         padding: 0.25rem 0.75rem;
         border-radius: 9999px;
@@ -100,16 +98,7 @@
         color: var(--warning-color);
     }
 
-    .status-remarcado {
-        background: #e0e7ff;
-        color: #6366f1;
-    }
-
-    .status-reagendado {
-        background: #fef3c7;
-        color: var(--warning-color);
-    }
-
+    /* Ações dos agendamentos */
     .appointment-actions {
         display: flex;
         gap: 0.5rem;
@@ -158,6 +147,7 @@
         transform: scale(1.05);
     }
 
+    /* Estatísticas */
     .stats-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
@@ -189,6 +179,7 @@
     .stat-cancelados .stat-number { color: var(--danger-color); }
     .stat-faltaram .stat-number { color: var(--warning-color); }
 
+    /* Financeiro */
     .financial-summary {
         padding: 1.5rem;
     }
@@ -226,6 +217,7 @@
         color: var(--danger-color);
     }
 
+    /* Ações rápidas */
     .quick-actions {
         padding: 1.5rem;
         display: flex;
@@ -269,6 +261,7 @@
         color: white;
     }
 
+    /* Estado vazio */
     .empty-state {
         text-align: center;
         padding: 3rem 2rem;
@@ -281,19 +274,7 @@
         opacity: 0.5;
     }
 
-    .notification-badge {
-        background: var(--danger-color);
-        color: white;
-        border-radius: 50%;
-        width: 20px;
-        height: 20px;
-        font-size: 0.75rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-left: auto;
-    }
-
+    /* Barra de progresso */
     .progress-bar {
         width: 100%;
         height: 8px;
@@ -309,10 +290,69 @@
         transition: width 0.3s ease;
     }
 
+    /* Seletor de Dentistas */
+    .dentist-selector {
+        cursor: pointer;
+        transition: all 0.2s;
+        border-bottom: 3px solid transparent;
+        min-width: 80px;
+    }
+    
+    .dentist-selector:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .dentist-selector.active {
+        border-bottom: 3px solid var(--primary-color);
+    }
+    
+    .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Dias do Calendário */
+    .calendar-day {
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .calendar-day:hover {
+        background-color: #f0f7ff;
+    }
+    
+    .calendar-day.active {
+        background-color: var(--primary-color);
+        color: white;
+    }
+    
+    /* Cores para os dentistas */
+    .bg-primary { background-color: var(--primary-color); }
+    .bg-success { background-color: var(--success-color); }
+    .bg-warning { background-color: var(--warning-color); }
+    .bg-danger { background-color: var(--danger-color); }
+    .bg-info { background-color: var(--info-color); }
+    .bg-secondary { background-color: var(--secondary-color); }
+
+    /* Responsividade */
     @media (max-width: 1024px) {
         .dashboard-content {
             grid-template-columns: 1fr;
             padding: 1rem;
+        }
+        
+        .appointment-details {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+        
+        .dentist-selector {
+            padding: 0.5rem;
         }
     }
 </style>
@@ -325,16 +365,100 @@
     <div class="appointments-main">
         <div class="card">
             <div class="card-header py-3">
-                <h3>
-                    <i class="fas fa-calendar-day"></i>
-                    Agendamentos de Hoje
-                </h3>
-                <span class="notification-badge">{{ agendamentos.paginator.count }}</span>
+                <!-- Dentist Selector -->
+                <div class="row mb-3">
+                    <div class="col">
+                        <div class="d-flex overflow-auto py-2">
+                            {% for dentista in dentistas %}
+                            <div class="dentist-selector {% if dentista.id == dentista_selecionado %}active{% endif %} p-3 text-center me-2" 
+                                 data-dentista-id="{{ dentista.id }}">
+                                <div class="avatar bg-{{ dentista.cor|default:'primary' }} text-white rounded-circle d-inline-flex align-items-center justify-content-center" 
+                                     style="width: 40px; height: 40px;">
+                                    <i class="fas fa-user-md"></i>
+                                </div>
+                                <div class="mt-1 small"> {{ dentista.nome }}</div>
+                            </div>
+                            {% endfor %}
+                            <div class="dentist-selector p-3 text-center {% if dentista_selecionado == 'todos' %}active{% endif %}" data-dentista-id="todos">
+                                <div class="avatar bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center" 
+                                     style="width: 40px; height: 40px;">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="mt-1 small">Todos</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Calendar Navigation -->
+                <div class="row mb-3">
+                    <div class="col">
+                        <div class="d-flex justify-content-between align-items-center p-3 bg-white rounded">
+                            <button class="btn btn-outline-primary" id="prev-week" data-offset="-1">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <h5 class="mb-0 text-center" id="current-week">
+                                {% if view_type == 'day' %}
+                                    {{ data_inicio|date:"d/m/Y" }}
+                                {% elif view_type == 'week' %}
+                                    Semana {{ semana_atual }}: {{ data_inicio|date:"d/m/Y" }} - {{ data_fim|date:"d/m/Y" }}
+                                {% else %}
+                                    {{ data_inicio|date:"F/Y" }}
+                                {% endif %}
+                            </h5>
+                            <button class="btn btn-outline-primary" id="next-week" data-offset="1">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Week Days - Mostrado apenas para visualização diária/semanal -->
+                {% if view_type != 'month' %}
+                <div class="row mb-3">
+                    <div class="col">
+                        <div class="d-flex bg-white rounded">
+                            {% for dia in dias_semana %}
+                            <div class="calendar-day {% if dia.data == data_inicio %}active{% endif %} text-center py-2 flex-fill" 
+                                 data-date="{{ dia.data|date:'Y-m-d' }}">
+                                <div class="fw-bold">{{ dia.nome }}</div>
+                                <div>{{ dia.data|date:"d" }}</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- View Options -->
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <h3>
+                        <i class="fas fa-calendar-day"></i>
+                        Agendamentos
+                        <span class="notification-badge">{{ total_agendamentos }}</span>
+                    </h3>
+                    <div class="btn-group">
+                        <a href="?view=day&date={{ data_inicio|date:'Y-m-d' }}&dentista={{ dentista_selecionado }}" 
+                           class="btn btn-sm btn-outline-secondary {% if view_type == 'day' %}active{% endif %}">
+                            Dia
+                        </a>
+                        <a href="?view=week&date={{ data_inicio|date:'Y-m-d' }}&dentista={{ dentista_selecionado }}" 
+                           class="btn btn-sm btn-outline-secondary {% if view_type == 'week' %}active{% endif %}">
+                            Semana
+                        </a>
+                        <a href="?view=month&date={{ data_inicio|date:'Y-m-d' }}&dentista={{ dentista_selecionado }}" 
+                           class="btn btn-sm btn-outline-secondary {% if view_type == 'month' %}active{% endif %}">
+                            Mês
+                        </a>
+                    </div>
+                </div>
             </div>
+            
+            <!-- Lista de Agendamentos -->
             <div class="card-body">
                 {% if agendamentos %}
                     {% for agendamento in agendamentos %}
-                        <div class="appointment-item">
+                        <div class="appointment-item" data-agendamento-id="{{ agendamento.id }}">
                             <div class="appointment-time">{{ agendamento.hora|time:"H:i" }}</div>
                             <div class="appointment-info">
                                 <div class="patient-name">{{ agendamento.paciente.nome }}</div>
@@ -342,61 +466,47 @@
                                     {% if agendamento.dentista %}
                                         <span><i class="fas fa-user-md"></i> {{ agendamento.dentista.nome }}</span>
                                     {% endif %}
-                                    {% if agendamento.confirmacao == 'sim' %}
-                                    <span class="text-success">
-                                     <i class="fas fa-check-circle"></i> {{ agendamento.get_confirmacao_display }}
+                                    <span class="{% if agendamento.confirmacao == 'confirmado' %}text-success{% else %}text-secondary{% endif %}">
+                                        <i class="fas {% if agendamento.confirmacao == 'confirmado' %}fa-check-circle{% else %}fa-clock{% endif %}"></i> 
+                                        {{ agendamento.get_confirmacao_display }}
                                     </span>
-                                    {% else %}
-                                    <span class="text-secondary">
-                                     <i class="fas fa-clock"></i> {{ agendamento.get_confirmacao_display }}
+                                    <span class="status-badge status-{{ agendamento.status|lower }}">
+                                        {{ agendamento.get_status_display }}
                                     </span>
-                                    {% endif %}
-                                    <span class="status-badge status-{{ agendamento.status|lower }}">{{ agendamento.get_status_display|default:agendamento.status|capfirst }}</span>
                                 </div>
                             </div>
                             <div class="appointment-actions">
-    {% if agendamento.status == 'agendado' %}
-        <button class="btn-action btn-check" title="Marcar como Atendido" data-agendamento-id="{{ agendamento.id }}">
-            <i class="fas fa-check"></i>
-        </button>
-        <a href="{% url 'agendamento:editar_agenda' pk=agendamento.id %}" class="btn-action btn-edit" title="Editar">
-            <i class="fas fa-edit"></i>
-        </a>
-        <a href="{% url 'agendamento:excluir_agenda' pk=agendamento.id %}" 
-         class="btn-action"
-         style="background-color: #dc3545; color: white; width: 36px; height: 36px; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 0.875rem;" 
-         title="Excluir agendamento"> 
-         <i class="fas fa-times"></i>
-        </a>
-    {% elif agendamento.status == 'atendido' %}
-        <a href="{% url 'agendamento:editar_agenda' pk=agendamento.id %}" class="btn-action btn-edit" title="Editar">
-            <i class="fas fa-edit"></i>
-        </a>
-       <a href="{% url 'agendamento:excluir_agenda' pk=agendamento.id %}" 
-         class="btn-action"
-         style="background-color: #dc3545; color: white; width: 36px; height: 36px; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 0.875rem;" 
-         title="Excluir agendamento"> 
-         <i class="fas fa-times"></i>
-        </a>
-    {% elif agendamento.status == 'cancelado' or agendamento.status == 'faltou' %}
-        <a href="{% url 'agendamento:editar_agenda' pk=agendamento.id %}" class="btn-action btn-edit" title="Reagendar">
-            <i class="fas fa-redo"></i>
-        </a>
-        <a href="{% url 'agendamento:excluir_agenda' pk=agendamento.id %}" 
-         class="btn-action"
-         style="background-color: #dc3545; color: white; width: 36px; height: 36px; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 0.875rem;" 
-         title="Excluir agendamento"> 
-         <i class="fas fa-times"></i>
-        </a>
-    {% endif %}
-</div>
-
+                                {% if agendamento.status == 'agendado' %}
+                                    <button class="btn-action btn-check" title="Marcar como Atendido" 
+                                            data-agendamento-id="{{ agendamento.id }}">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <a href="{% url 'agendamento:editar_agenda' pk=agendamento.id %}" 
+                                       class="btn-action btn-edit" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button class="btn-action btn-cancel" title="Cancelar"
+                                            data-agendamento-id="{{ agendamento.id }}">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                {% elif agendamento.status == 'atendido' %}
+                                    <a href="{% url 'agendamento:editar_agenda' pk=agendamento.id %}" 
+                                       class="btn-action btn-edit" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                {% elif agendamento.status == 'cancelado' or agendamento.status == 'faltou' %}
+                                    <a href="{% url 'agendamento:editar_agenda' pk=agendamento.id %}" 
+                                       class="btn-action btn-edit" title="Reagendar">
+                                        <i class="fas fa-redo"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
                         </div>
                     {% endfor %}
                 {% else %}
                     <div class="empty-state">
                         <i class="fas fa-calendar-check"></i>
-                        <p>Nenhum agendamento para hoje.</p>
+                        <p>Nenhum agendamento para este período.</p>
                     </div>
                 {% endif %}
             </div>
@@ -408,7 +518,7 @@
                         <ul class="pagination">
                             {% if agendamentos.has_previous %}
                                 <li class="page-item">
-                                    <a class="page-link" href="?page_agendamentos={{ agendamentos.previous_page_number }}">Anterior</a>
+                                    <a class="page-link" href="?page={{ agendamentos.previous_page_number }}&view={{ view_type }}&date={{ data_inicio|date:'Y-m-d' }}&dentista={{ dentista_selecionado }}">Anterior</a>
                                 </li>
                             {% endif %}
 
@@ -419,14 +529,14 @@
                                     </li>
                                 {% else %}
                                     <li class="page-item">
-                                        <a class="page-link" href="?page_agendamentos={{ i }}">{{ i }}</a>
+                                        <a class="page-link" href="?page={{ i }}&view={{ view_type }}&date={{ data_inicio|date:'Y-m-d' }}&dentista={{ dentista_selecionado }}">{{ i }}</a>
                                     </li>
                                 {% endif %}
                             {% endfor %}
 
                             {% if agendamentos.has_next %}
                                 <li class="page-item">
-                                    <a class="page-link" href="?page_agendamentos={{ agendamentos.next_page_number }}">Próximo</a>
+                                    <a class="page-link" href="?page={{ agendamentos.next_page_number }}&view={{ view_type }}&date={{ data_inicio|date:'Y-m-d' }}&dentista={{ dentista_selecionado }}">Próximo</a>
                                 </li>
                             {% endif %}
                         </ul>
@@ -536,7 +646,6 @@
                 </h3>
             </div>
             <div class="quick-actions">
-                
                 <a href="{% url 'paciente:cadastrar_paciente' %}" class="btn-quick btn-primary">
                     <i class="fas fa-user-plus"></i>
                     Cadastrar Paciente
@@ -554,11 +663,14 @@
 {% block extra_js %}
 <script>
     const CSRF_TOKEN = "{{ csrf_token }}";
+    const CURRENT_DATE = "{{ data_inicio|date:'Y-m-d' }}";
+    const VIEW_TYPE = "{{ view_type }}";
+    const DENTISTA_SELECIONADO = "{{ dentista_selecionado|default:'todos' }}";
 
     // Função para enviar requisição AJAX
     async function updateAppointmentStatus(agendamentoId, newStatus) {
         try {
-            const response = await fetch(`/agendamentos/${agendamentoId}/atualizar_status/`, {
+            const response = await fetch(`/agendamento/agendamentos/${agendamentoId}/atualizar_status/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -570,22 +682,8 @@
             const data = await response.json();
 
             if (data.success) {
-                // Atualizar o DOM com base na resposta do servidor
-                const appointmentItem = document.querySelector(`button[data-agendamento-id="${agendamentoId}"]`).closest('.appointment-item');
-                const statusBadge = appointmentItem.querySelector('.status-badge');
-                statusBadge.className = `status-badge status-${data.new_status}`;
-                statusBadge.textContent = data.new_status_display;
-
-                // Remover/adicionar botões conforme a lógica de status
-                if (newStatus === 'atendido' || newStatus === 'cancelado') {
-                    appointmentItem.querySelector('.btn-check')?.remove();
-                    appointmentItem.querySelector('.btn-cancel')?.remove();
-                }
-
-                updateStats(); // Atualiza as estatísticas globais
-                
-                // Mostrar feedback visual
-                showNotification(`Agendamento ${data.new_status_display.toLowerCase()} com sucesso!`, 'success');
+                // Recarrega a página para atualizar os dados
+                window.location.reload();
             } else {
                 console.error('Erro ao atualizar status:', data.error);
                 showNotification('Erro ao atualizar status: ' + data.error, 'error');
@@ -598,66 +696,111 @@
 
     // Função para mostrar notificações
     function showNotification(message, type) {
-        // Implementação simples com alert, você pode melhorar com toast/modal
-        if (type === 'success') {
-            alert('✅ ' + message);
-        } else {
-            alert('❌ ' + message);
-        }
+        // Implementação com Toastr ou similar seria melhor
+        alert(type === 'success' ? '✅ ' + message : '❌ ' + message);
     }
 
     // Event listeners dos botões de ação
-    document.querySelectorAll('.btn-action').forEach(button => {
+    document.querySelectorAll('.btn-check').forEach(button => {
         button.addEventListener('click', function(e) {
             e.stopPropagation();
             const agendamentoId = this.dataset.agendamentoId;
+            updateAppointmentStatus(agendamentoId, 'atendido');
+        });
+    });
 
-            if (this.classList.contains('btn-check')) {
-                updateAppointmentStatus(agendamentoId, 'atendido');
-            } else if (this.classList.contains('btn-cancel')) {
-                if (confirm('Tem certeza que deseja cancelar este agendamento?')) {
-                    updateAppointmentStatus(agendamentoId, 'cancelado');
-                }
+    document.querySelectorAll('.btn-cancel').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const agendamentoId = this.dataset.agendamentoId;
+            
+            if (confirm('Tem certeza que deseja cancelar este agendamento?')) {
+                updateAppointmentStatus(agendamentoId, 'cancelado');
             }
         });
     });
 
-    // Função para atualizar estatísticas
-    function updateStats() {
-        const appointments = document.querySelectorAll('.appointment-item');
-        let agendados = 0, atendidos = 0, cancelados = 0, faltaram = 0;
-        
-        appointments.forEach(item => {
-            const status = item.querySelector('.status-badge');
-            if (status.classList.contains('status-agendado')) agendados++;
-            else if (status.classList.contains('status-atendido')) atendidos++;
-            else if (status.classList.contains('status-cancelado')) cancelados++;
-            else if (status.classList.contains('status-faltou')) faltaram++;
-        });
-        
-        // Atualizar progresso
-        const total = appointments.length;
-        const completed = atendidos + cancelados + faltaram;
-        const progress = total > 0 ? (completed / total) * 100 : 0;
-        
-        document.getElementById('progress-fill').style.width = progress + '%';
-        document.getElementById('progress-percentage').textContent = progress.toFixed(1) + '%';
-        
-        // Atualizar badge de notificação
-        document.querySelector('.notification-badge').textContent = agendados;
+    // Navegação por semana/mês
+    document.getElementById('prev-week').addEventListener('click', function() {
+        navigateCalendar(this.dataset.offset);
+    });
+
+    document.getElementById('next-week').addEventListener('click', function() {
+        navigateCalendar(this.dataset.offset);
+    });
+
+    function navigateCalendar(offset) {
+    const dateParts = CURRENT_DATE.split("-");
+    const currentDate = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
+    
+    let newDate = new Date(currentDate); // Cria cópia
+
+    if (VIEW_TYPE === 'day') {
+        newDate.setDate(currentDate.getDate() + parseInt(offset));
+    } else if (VIEW_TYPE === 'week') {
+        newDate.setDate(currentDate.getDate() + (parseInt(offset) * 7));
+    } else if (VIEW_TYPE === 'month') {
+        newDate.setMonth(currentDate.getMonth() + parseInt(offset));
+        newDate.setDate(1); // Sempre ir para o primeiro dia do mês
     }
 
-    // Adicionar hover effects aos itens de agendamento
-    document.querySelectorAll('.appointment-item').forEach(item => {
+     const year = newDate.getFullYear();
+     const month = String(newDate.getMonth() + 1).padStart(2, '0');
+     const day = String(newDate.getDate()).padStart(2, '0');
+
+     const formattedDate = `${year}-${month}-${day}`;
+ 
+     window.location.href = `?view=${VIEW_TYPE}&date=${formattedDate}&dentista=${DENTISTA_SELECIONADO}`;
+    }
+
+    // Filtro por dentista
+    document.querySelectorAll('.dentist-selector').forEach(item => {
         item.addEventListener('click', function() {
-            // Aqui você pode adicionar lógica para abrir detalhes do agendamento
-            const patientName = this.querySelector('.patient-name').textContent;
-            console.log('Clicou no agendamento:', patientName);
+            document.querySelectorAll('.dentist-selector').forEach(el => el.classList.remove('active'));
+            this.classList.add('active');
+            const dentistaId = this.dataset.dentistaId;
+            window.location.href = `?view=${VIEW_TYPE}&date=${CURRENT_DATE}&dentista=${dentistaId}`;
         });
     });
 
-    // Calcular progresso inicial
-    document.addEventListener('DOMContentLoaded', updateStats);
+    // Filtro por data (quando clica em um dia)
+    document.querySelectorAll('.calendar-day').forEach(item => {
+        item.addEventListener('click', function() {
+            document.querySelectorAll('.calendar-day').forEach(el => el.classList.remove('active'));
+            this.classList.add('active');
+            const dataSelecionada = this.dataset.date;
+            window.location.href = `?view=day&date=${dataSelecionada}&dentista=${DENTISTA_SELECIONADO}`;
+        });
+    });
+
+    // Ao clicar em um agendamento, mostra detalhes
+    document.querySelectorAll('.appointment-item').forEach(item => {
+        item.addEventListener('click', function() {
+            const agendamentoId = this.dataset.agendamentoId;
+            // Aqui você pode implementar um modal com detalhes do agendamento
+            console.log('Visualizar agendamento:', agendamentoId);
+        });
+    });
+
+    // Atualiza a badge de notificação
+    function updateNotificationBadge() {
+        const agendamentosHoje = document.querySelectorAll('.appointment-item').length;
+        document.querySelector('.notification-badge').textContent = agendamentosHoje;
+    }
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', function() {
+        updateNotificationBadge();
+        
+        // Marca o dentista selecionado
+        document.querySelector(`.dentist-selector[data-dentista-id="${DENTISTA_SELECIONADO}"]`)?.classList.add('active');
+        
+        // Para visualização mensal, mostra o mês no título
+        if (VIEW_TYPE === 'month') {
+            const date = new Date(CURRENT_DATE);
+            document.getElementById('current-week').textContent = 
+                date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }).replace(/^\w/, c => c.toUpperCase());
+        }
+    });
 </script>
 {% endblock %}
-
