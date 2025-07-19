@@ -18,8 +18,8 @@ STATUS_CORES = {
 }
 
 CONFIRMACAO_CHOICES = [
-    ('sim', 'Sim'),
-    ('nao', 'Não'),
+    ('confirmado', 'Confirmado'),
+    ('aguardando', 'Aguardando'),
 ]
 
 class Dentista(models.Model):
@@ -36,9 +36,9 @@ class Agendamento(models.Model):
     hora = models.TimeField()
     status = models.CharField(max_length=20, choices=STATUS, default='agendado')
     confirmacao = models.CharField(
-        max_length=10,
+        max_length=12,
         choices=CONFIRMACAO_CHOICES,
-        default='nao'
+        default='aguardando'
     )
     observacoes = models.TextField(blank=True, null=True)
 
